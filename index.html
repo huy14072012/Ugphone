@@ -15,23 +15,32 @@
         .coin-amount { color: #10b981; font-weight: bold; font-size: 24px; }
         .btn-link { display: block; background: linear-gradient(135deg, #f43f5e, #e11d48); color: white; text-decoration: none; font-weight: bold; padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 16px; transition: 0.2s; }
         .btn-link:hover { transform: scale(1.02); }
+        
+        /* Khu vực Shop đổi acc */
         .shop-box { background: #111827; padding: 20px; border-radius: 8px; border: 1px solid #4b5563; text-align: left; margin-top: 25px; }
         .shop-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
         .btn-buy { background: #10b981; color: white; padding: 10px 22px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; }
         .btn-buy:hover { background: #059669; }
-        .cloud-box { background: #111827; border: 2px solid #38bdf8; border-radius: 12px; padding: 25px; margin-top: 35px; text-align: center; box-shadow: 0 0 15px rgba(56, 189, 248, 0.1); }
-        .cloud-icon { width: 65px; height: 65px; fill: #38bdf8; margin-bottom: 10px; animation: float 3s ease-in-out infinite; }
-        .cloud-title { font-size: 18px; color: #fff; font-weight: bold; margin-bottom: 5px; }
-        .cloud-desc { font-size: 13px; color: #94a3b8; margin-bottom: 15px; }
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-8px); } 100% { transform: translateY(0px); } }
-        .btn-cloud { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; text-decoration: none; text-align: center; background: linear-gradient(135deg, #0ea5e9, #2563eb); color: white; transition: 0.2s; }
-        .btn-cloud:hover { transform: scale(1.02); background: linear-gradient(135deg, #38bdf8, #1d4ed8); }
+        
+        /* Khu vực hình đám mây Auto Mua Máy */
+        .cloud-link { display: block; text-decoration: none; color: inherit; margin-top: 35px; }
+        .cloud-box { background: #111827; border: 2px solid #38bdf8; border-radius: 12px; padding: 25px; text-align: center; transition: 0.2s; cursor: pointer; box-shadow: 0 0 15px rgba(56, 189, 248, 0.1); }
+        .cloud-box:hover { transform: scale(1.01); background: #151f32; border-color: #0ea5e9; }
+        .cloud-icon { width: 70px; height: 70px; fill: #38bdf8; margin-bottom: 10px; animation: float 3s ease-in-out infinite; }
+        .cloud-title { font-size: 20px; color: #38bdf8; font-weight: bold; margin-bottom: 5px; }
+        .cloud-desc { font-size: 13px; color: #94a3b8; }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(0px); }
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Hệ Thống Kiếm Coin & Treo Máy Đám Mây</h1>
+        <h1>Hệ Thống Kiếm Coin & Đổi Tài Khoản</h1>
         
         <div class="wallet-box">
             Ví Coin Thiết Bị: <span id="user-coin" class="coin-amount">0</span> COIN
@@ -44,21 +53,22 @@
             <h3 style="color: #fff; margin-bottom: 10px; border-bottom: 2px solid #3b82f6; padding-bottom: 5px;">🛒 Đổi Tài Khoản UgPhone</h3>
             <div class="shop-item">
                 <div>
-                    <strong>Gói Treo Game Hạn Giờ (4 Tiếng)</strong><br>
+                    <strong>Gói Treo Game Hạn Giờ (Ngẫu Nhiên)</strong><br>
                     <span style="color: #94a3b8; font-size: 13px;">Giá bán: 2 Coin / lượt đổi</span>
                 </div>
                 <button onclick="buyUgPhone()" class="btn-buy">Đổi Ngay</button>
             </div>
         </div>
 
-        <div class="cloud-box">
-            <svg class="cloud-icon" viewBox="0 0 24 24">
-                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z"/>
-            </svg>
-            <div class="cloud-title">Cửa Hàng Cloud Phone Gốc</div>
-            <div class="cloud-desc">Nhấn vào để đến trang quản trị hệ thống nạp và mua máy ảo.</div>
-            <a href="https://clientclone.ayabloxtraicay.site/autobuyugphone.php" target="_blank" class="btn-cloud">🛒 Nhấn Để Đến Trang Mua Máy</a>
-        </div>
+        <a href="https://clientclone.ayabloxtraicay.site/autobuyugphone.php" target="_blank" class="cloud-link">
+            <div class="cloud-box">
+                <svg class="cloud-icon" viewBox="0 0 24 24">
+                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z"/>
+                </svg>
+                <div class="cloud-title">Auto Mua UgPhone</div>
+                <div class="cloud-desc">Nhấn vào đây để đến hệ thống tự động mua máy ảo và nạp tiền gốc.</div>
+            </div>
+        </a>
     </div>
 
     <script>
@@ -78,19 +88,18 @@
             }
 
             if (typeof listAcc === 'undefined' || listAcc.length === 0) {
-                alert("Hệ thống kho tài khoản đang bảo trì, vui lòng quay lại sau!");
+                alert("Hệ thống kho tài khoản trống hoặc đang bảo trì!");
                 return;
             }
 
-            // Thuật toán xoay tua acc 4 tiếng theo thời gian thực
-            const currentHour = new Date().getHours(); 
-            let chosenIndex = Math.floor(currentHour / 4) % listAcc.length;
+            const randomIndex = Math.floor(Math.random() * listAcc.length);
+            const chosenAccount = listAcc[randomIndex];
 
             coin -= 2;
             localStorage.setItem('guest_coin', coin.toString());
             document.getElementById('user-coin').innerText = coin;
 
-            localStorage.setItem('last_purchased_acc', listAcc[chosenIndex]);
+            localStorage.setItem('temp_random_acc', chosenAccount);
             window.location.href = "giu-tai-khoan.html";
         }
     </script>
