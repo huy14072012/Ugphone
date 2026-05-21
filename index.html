@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Đổi Máy UgPhone</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* KHỐI HỘP ĐEN GỐC CHUẨN ĐẸP 100% NHƯ ẢNH CỦA BẠN */
+        .main-card {
+            background-color: #1a1a1a;
+            width: 100%;
+            max-width: 380px;
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .main-title {
+            color: #00e676;
+            font-size: 22px;
+            font-weight: bold;
+            text-transform: uppercase;
+            line-height: 1.3;
+            letter-spacing: 0.5px;
+        }
+
+        .sub-title {
+            color: #ffcc00;
+            font-size: 24px;
+            font-weight: bold;
+            background-color: #262626;
+            padding: 14px;
+            border-radius: 10px;
+            margin: 20px auto;
+            width: 90%;
+        }
+
+        .btn-custom {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 90%;
+            padding: 14px 16px;
+            margin: 8px auto;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            color: #ffffff;
+        }
+
+        .btn-blue { background-color: #007bff; }
+        .btn-green { background-color: #28a745; }
+
+        /* KHUNG NÉT ĐỨT MÀU XANH LÁ */
+        .success-box {
+            border: 2px dashed #00e676;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px auto 0 auto;
+            width: 90%;
+        }
+
+        .success-title {
+            color: #00e676;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .info-text {
+            color: #cccccc;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .account-table {
+            width: 100%;
+            margin: 10px 0 15px 0;
+            border-collapse: collapse;
+            background-color: #222222;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .account-table td {
+            padding: 10px;
+            font-size: 12px;
+            text-align: left;
+            border-bottom: 1px solid #333333;
+            color: #ffffff;
+        }
+
+        .json-textarea {
+            width: 100%;
+            height: 75px;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background-color: #121212;
+            color: #00e676;
+            font-family: monospace;
+            font-size: 11px;
+            resize: none;
+            outline: none;
+        }
+
+        .btn-copy {
+            width: 100%;
+            margin-top: 6px;
+            padding: 6px;
+            background-color: #ffcc00;
+            color: #000000;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .btn-cloud {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            box-shadow: 0px 4px 15px rgba(0, 114, 255, 0.4);
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-card">
+        <h1 class="main-title">HỆ THỐNG ĐỔI MÁY</h1>
+        <h1 class="main-title">UGPHONE</h1>
+
+        <div class="sub-title">Ví của bạn: <span id="userCoin">168</span> COIN</div>
+
+        <button class="btn-custom btn-blue" onclick="nhanCoinLuon()">
+            🔗 NHẬN LUÔN COIN (+6 COIN)
+        </button>
+
+        <button class="btn-custom btn-green" onclick="batDauDoiMay()">
+            🎁 ĐỔI MÁY NGAY (Tốn 2 Coin)
+        </button>
+
+        <div id="successBox" class="success-box" style="display: none;">
+            <p class="success-title">🎉 ĐỔI MÁY THÀNH CÔNG!</p>
+            <p class="info-text">Đã trừ 2 Coin trong ví của bạn.</p>
+
+            <table class="account-table">
+                <tbody>
+                    <tr>
+                        <td style="width: 30%; font-weight: bold; color: #aaa;">Hạn máy:</td>
+                        <td style="color: #00e676; font-weight: bold;">Mới tinh (4 Giờ)</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #aaa; vertical-align: top; padding-top: 12px;">Mã Code:</td>
+                        <td>
+                            <textarea id="jsonTokenArea" class="json-textarea" readonly></textarea>
+                            <button class="btn-copy" onclick="copyUgPhoneToken()">📋 Sao chép mã</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <a href="https://www.ugphone.com" target="_blank" class="btn-custom btn-cloud">
+                ☁️ auto mua máy và quick login code
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // --- ĐIỀN THÔNG TIN SUPABASE CỦA BẠN VÀO ĐÂY ---
+        const SUPABASE_URL = "https://your-project-id.supabase.co";
+        const SUPABASE_KEY = "your-anon-key";
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Khởi tạo số xu mặc định khi khách vừa vào trang web
+        let currentCoin = parseInt(localStorage.getItem("my_test_coins")) || 168;
+        document.getElementById("userCoin").innerText = currentCoin;
+
+        // Hàm xử lý khi ấn nút nhận luôn coin (Không cần vượt link thực tế)
+        function nhanCoinLuon() {
+            currentCoin += 6;
+            localStorage.setItem("my_test_coins", currentCoin);
+            document.getElementById("userCoin").innerText = currentCoin;
+            alert("Đã cộng thêm 6 Coin vào ví thành công!");
+        }
+
+        // Hàm xử lý đổi máy kết nối vào bảng 'kho_may'
+        async function batDauDoiMay() {
+            if (currentCoin < 2) {
+                alert("Bạn không đủ Coin!");
+                return;
+            }
+
+            // Kết nối tìm đúng dòng dữ liệu trong bảng kho_may của bạn
+            let { data: khoMay, error } = await _supabase
+                .from('kho_may') 
+                .select('*')
+                .limit(1); // Lấy tài khoản UgPhone đầu tiên bạn nạp ở Bước 1
+
+            if (error || !khoMay || khoMay.length === 0) {
+                alert("Hết máy trong bảng 'kho_may' rồi! Bạn hãy làm theo Bước 1 để nạp thêm acc vào database nhé.");
+                return;
+            }
+
+            // Trừ 2 xu lưu lại vào bộ nhớ máy khách
+            currentCoin -= 2;
+            localStorage.setItem("my_test_coins", currentCoin);
+            document.getElementById("userCoin").innerText = currentCoin;
+
+            // Đổ dữ liệu mã máy ra ô bảng thông tin. 
+            // Lưu ý: Thay chữ 'ma_token' thành tên cột chứa mã UgPhone thật trong bảng của bạn
+            document.getElementById("jsonTokenArea").value = khoMay[0].ma_token || JSON.stringify(khoMay[0]); 
+            document.getElementById("successBox").style.display = "block";
+        }
+
+        function copyUgPhoneToken() {
+            let copyText = document.getElementById("jsonTokenArea");
+            if (copyText.value === "") return;
+            copyText.select();
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                alert("Đã sao chép mã thành công!");
+            });
+        }
+    </script>
+</body>
+</html>
+ Đổ chuỗi JSON bốc được vào ô text rồi hiện bảng
+            document.getElementById("jsonTokenArea").value = khoMay.json_data; 
+            document.getElementById("successBox").style.display = "block";
+        }
+
+        // Hàm sao chép mã nhanh
+        function copyUgPhoneToken() {
+            let copyText = document.getElementById("jsonTokenArea");
+            if (copyText.value === "") return;
+
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                alert("Đã sao chép mã JSON UgPhone thành công!");
+            }).catch(err => {
+                alert("Trình duyệt chặn, hãy đè tay vào ô chữ để tự copy nha.");
+            });
+        }
+    </script>
+</body>
+</html>
