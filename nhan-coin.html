@@ -46,7 +46,7 @@
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="main-box">
     <h2>🎉 VƯỢT LINK THÀNH CÔNG!</h2>
     <div class="notice">
         <strong>Chúc mừng bạn!</strong> Bạn đã hoàn thành nhiệm vụ vượt link quảng cáo. Bấm nút bên dưới để cộng 6 Coin vào ví.
@@ -56,12 +56,33 @@
 </div>
 
 <script>
+    // Lấy ngày hôm nay (Ví dụ: "2026-05-21")
+    const homNay = new Date().toISOString().split('T')[0];
+    
+    // Kiểm tra xem người này hôm nay đã nhận coin lần nào chưa
+    const ngayDaNhan = localStorage.getItem('ngay_da_nhan_coin');
+
+    // NẾU ĐÃ NHẬN RỒI -> KHÓA LUÔN TRANG, KHÔNG CHO BẤM NÚT
+    if (ngayDaNhan === homNay) {
+        document.getElementById('main-box').innerHTML = `
+            <h2 style="color: #ff4d4d;">❌ BẠN ĐÃ NHẬN COIN HÔM NAY!</h2>
+            <p style="font-size: 15px; margin-top: 15px; color: #aaa;">Mỗi ngày bạn chỉ được nhận coin 1 lần duy nhất từ hệ thống để tránh gian lận.</p>
+            <p style="color: #ffcc00; font-weight: bold;">Hãy quay lại vào ngày mai nhé!</p>
+            <button class="btn-claim" style="background-color: #007bff; color: white; margin-top: 15px;" onclick="window.location.href='index.html'">Quay lại Trang Chủ</button>
+        `;
+    }
+
     function congCoin() {
+        // Đánh dấu vào bộ nhớ máy là "Hôm nay người này đã ăn coin rồi"
+        localStorage.setItem('ngay_da_nhan_coin', homNay);
+
+        // Tiến hành cộng coin như bình thường
         let currentCoin = parseInt(localStorage.getItem('user_coins')) || 0;
         currentCoin += 6;
         localStorage.setItem('user_coins', currentCoin);
+        
         alert("Đã cộng 6 Coin vào tài khoản của bạn!");
-        window.location.href = "index.html"; // Quay lại trang chủ đổi máy
+        window.location.href = "index.html"; // Chuyển ngay về trang chủ
     }
 </script>
 
