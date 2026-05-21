@@ -3,95 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UgPhone Hub - Cày Coin Đổi Máy</title>
+    <title>Cày Coin Đổi Mã UgPhone</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #0b0f19; color: #e2e8f0; line-height: 1.6; padding: 20px; }
-        .container { max-width: 650px; margin: 30px auto; background: #1f2937; padding: 30px; border-radius: 12px; border: 1px solid #374151; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-        h1 { color: #fff; margin-bottom: 20px; font-size: 24px; }
-        p { color: #94a3b8; margin-bottom: 20px; font-size: 15px; }
-        .wallet-box { background: #111827; border: 1px dashed #10b981; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 18px; }
-        .coin-amount { color: #10b981; font-weight: bold; font-size: 24px; }
-        .btn-link { display: block; background: linear-gradient(135deg, #f43f5e, #e11d48); color: white; text-decoration: none; font-weight: bold; padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 16px; transition: 0.2s; }
-        .btn-link:hover { transform: scale(1.02); }
-        
-        .shop-box { background: #111827; padding: 20px; border-radius: 8px; border: 1px solid #4b5563; text-align: left; margin-top: 25px; }
-        .shop-title { color: #fff; margin-bottom: 15px; border-bottom: 2px solid #3b82f6; padding-bottom: 5px; font-size: 16px; }
-        .may-list-container { max-height: 400px; overflow-y: auto; padding-right: 5px; }
-        
-        .may-list-container::-webkit-scrollbar { width: 6px; }
-        .may-list-container::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
-
-        .may-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #1f2937; }
-        .may-info { font-size: 14px; }
-        .btn-buy { background: #10b981; color: white; padding: 8px 16px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; }
-        .btn-buy:hover { background: #059669; }
-        .btn-buy:disabled { background: #4b5563; color: #94a3b8; cursor: not-allowed; }
-
-        .result-box { display: none; background: #1f2937; border: 2px solid #10b981; border-radius: 8px; padding: 15px; margin-top: 15px; }
-        textarea { width: 100%; height: 110px; background: #0b0f19; color: #38bdf8; border: 1px solid #4b5563; border-radius: 6px; padding: 10px; font-family: monospace; font-size: 12px; resize: none; margin-bottom: 10px; }
-        .btn-copy { background: #3b82f6; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; }
-        .btn-copy:hover { background: #2563eb; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        h2 { color: #00ff88; }
+        .coin-box {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #ffcc00;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-link { background-color: #007bff; color: white; }
+        .btn-link:hover { background-color: #0056b3; }
+        .btn-exchange { background-color: #28a745; color: white; }
+        .btn-exchange:hover { background-color: #218838; }
+        .token-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #2d2d2d;
+            border: 1px dashed #00ff88;
+            border-radius: 8px;
+            display: none;
+            word-break: break-all;
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Hệ Thống Kiếm Coin & Đổi Máy Ảo</h1>
-        
-        <div class="wallet-box">
-            Ví Coin Thiết Bị: <span id="user-coin" class="coin-amount">0</span> COIN
-        </div>
-        <p>Cày thêm Coin bằng cách vượt link tài trợ bên dưới:</p>
-        
-        <a href="https://yeulink.com/link-rut-gon-cua-ban" target="_blank" class="btn-link">🚀 Vượt Link Kiếm Coin (+6 COIN)</a>
-        
-        <div class="shop-box">
-            <h3 class="shop-title">🛒 Chọn Máy Bạn Muốn Treo (Đám Mây Chống TRÙNG Tuyệt Đối)</h3>
-            
-            <div id="danh-sach-may-ui" class="may-list-container">
-                <p style="color: #94a3b8;">Đang kết nối tới Cơ sở dữ liệu đám mây Supabase...</p>
-            </div>
+<div class="container">
+    <h2>HỆ THỐNG ĐỔI MÁY UGPHONE</h2>
+    <p>Vượt link rút gọn để kiếm đủ 2 Coin và đổi lấy mã cấu hình máy ảo!</p>
+    
+    <div class="coin-box">Ví của bạn: <span id="coin-count">0</span> COIN</div>
+    
+    <button class="btn-link" onclick="vuotLink()">🔗 VƯỢT LINK NHẬN COIN (+6 COIN)</button>
+    
+    <button class="btn-exchange" onclick="doiMay()">🎁 ĐỔI MÁY NGAY (Tốn 2 Coin)</button>
+    
+    <div id="token-display" class="token-box"></div>
+</div>
 
-            <div id="acc-result" class="result-box">
-                <p style="color: #10b981; font-weight: bold; margin-bottom: 5px; text-align: left;" id="result-title">🎉 Đổi thành công!</p>
-                <textarea id="acc-text" readonly></textarea>
-                <div style="text-align: right;">
-                    <button onclick="copyAccount()" class="btn-copy">📋 Sao Chép Dữ Liệu</button>
-                </div>
-            </div>
-        </div>
-    </div>
+<script>
+    // 1. Cấu hình kết nối Supabase đã điền sẵn tài khoản của bạn
+    const SUPABASE_URL = "https://nigbaxusbacupefjkyud.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
+    
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    <script>
-        // 🔑 CẤU HÌNH ĐÃ ĐƯỢC RÁP KHỚP HOÀN TOÀN
-        const SUPABASE_URL = "https://nigbaxusbacupefjkyud.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
-        
-        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const THOI_GIAN_THUE_MAY = 2 * 60 * 60 * 1000; // Tự động reset máy sau 2 tiếng
+    // 2. Tự động kiểm tra và hiển thị số dư Coin của người dùng khi mở web
+    let currentCoin = parseInt(localStorage.getItem('user_coins')) || 0;
+    document.getElementById('coin-count').innerText = currentCoin;
 
-        let danhSachMayGlobal = [];
+    // 3. Hàm xử lý khi bấm nút "Vượt Link"
+    function vuotLink() {
+        window.location.href = "https://huy14072012.github.io/ugphone-web/nhan-coin.html"; 
+    }
 
-        function loadCoin() {
-            let myCoin = localStorage.getItem('guest_coin') || '0';
-            document.getElementById('user-coin').innerText = myCoin;
+    // 4. Hàm xử lý Logic chính: ĐỔI MÁY NGAY
+    async function doiMay() {
+        // Kiểm tra xem người dùng có đủ tiền không
+        if (currentCoin < 2) {
+            alert("Bạn không đủ số dư! Vui lòng bấm 'Vượt link' để kiếm thêm Coin nhé.");
+            return;
         }
 
-        // Hàm lấy dữ liệu thời gian thực từ Supabase về web
-        async function taiDuLieuKhoMay() {
-            const { data, error } = await supabase.from('kho_may').select('*').order('id', { ascending: true });
-            
-            if (error) {
-                document.getElementById('danh-sach-may-ui').innerHTML = "<p style='color: #f43f5e;'>Lỗi kết nối cơ sở dữ liệu! Hãy kiểm tra lại bảng dữ liệu trên Supabase.</p>";
+        try {
+            // Bước A: Lấy ra đúng 1 máy đang ở trạng thái 'trong' từ bảng kho_may
+            const { data: danhSachMay, error: loiLayMay } = await _supabase
+                .from('kho_may')
+                .select('*')
+                .eq('trang_thai', 'trong')
+                .limit(1);
+
+            // Nếu gặp lỗi kết nối hoặc trong kho không còn máy nào trống
+            if (loiLayMay || !danhSachMay || danhSachMay.length === 0) {
+                console.error("Chi tiết lỗi hệ thống:", loiLayMay);
+                alert("Hệ thống đang bảo trì hoặc hiện tại đã hết sạch máy trống. Vui lòng quay lại sau!");
                 return;
             }
 
-            danhSachMayGlobal = data;
-            renderMayList();
-        }
+            const mayChon = danhSachMay[0]; // Chọn máy đầu tiên tìm thấy
 
-        // Hàm vẽ giao diện và tự động check xem có máy nào hết hạn thuê để giải phóng không
-        async function renderMayList() {
-            if (danhSachMayGlobal.length ===
+            // Bước B: Tiến hành cập nhật máy này sang trạng thái đã bán và ghi nhận mốc thời gian
+            const { error: loiCapNhat } = await _supabase
+                .from('kho_may')
+                .update({ 
+                    trang_thai: 'da_ban', 
+                    thoi_gian_ban: new Date().toISOString() // Đưa thời gian thực chuẩn ISO lên Supabase
+                })
+                .eq('id', mayChon.id);
+
+            // Nếu quá trình cập nhật (ghi đè) bị Supabase từ chối
+            if (loiCapNhat) {
+                console.error("Lỗi cập nhật bảng Supabase:", loiCapNhat);
+                alert("Hệ thống bảo trì! Không thể cập nhật trạng thái máy.");
+                return;
+            }
+
+            // Bước C: Trừ tiền thành công và hiển thị kết quả cho người dùng
+            currentCoin -= 2;
+            localStorage.setItem('user_coins', currentCoin);
+            document.getElementById('coin-count').innerText = currentCoin;
+
+            // Show chuỗi Token mã máy ra màn hình để sao chép
+            const displayBox = document.getElementById('token-display');
+            displayBox.style.display = "block";
+            displayBox.innerHTML = `<strong>🎉 ĐỔI THÀNH CÔNG!</strong><br><br> MÃ MÁY CỦA BẠN LÀ:<br><code style="color: #00ff88;">${mayChon.token}</code>`;
+            
+            alert("Đổi máy thành công! Vui lòng copy mã ở khung viền xanh bên dưới màn hình.");
+
+        } catch (catchedError) {
+            console.error("Lỗi crash code:", catchedError);
+            alert("Hệ thống gặp lỗi xử lý ngoài ý muốn!");
+        }
+    }
+</script>
+
+</body>
+</html>
