@@ -70,7 +70,7 @@
 </div>
 
 <script>
-    // 1. Cấu hình kết nối Supabase đã điền sẵn tài khoản của bạn
+    // 1. Cấu hình kết nối Supabase của bạn
     const SUPABASE_URL = "https://nigbaxusbacupefjkyud.supabase.co";
     const SUPABASE_KEY = "sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
     
@@ -87,7 +87,6 @@
 
     // 4. Hàm xử lý Logic chính: ĐỔI MÁY NGAY
     async function doiMay() {
-        // Kiểm tra xem người dùng có đủ tiền không
         if (currentCoin < 2) {
             alert("Bạn không đủ số dư! Vui lòng bấm 'Vượt link' để kiếm thêm Coin nhé.");
             return;
@@ -101,12 +100,49 @@
                 .eq('trang_thai', 'trong')
                 .limit(1);
 
-            // Nếu gặp lỗi kết nối hoặc trong kho không còn máy nào trống
             if (loiLayMay || !danhSachMay || danhSachMay.length === 0) {
-                console.error("Chi tiết lỗi hệ thống:", loiLayMay);
+                console.error("Chi tiết lỗi lấy máy:", loiLayMay);
                 alert("Hệ thống đang bảo trì hoặc hiện tại đã hết sạch máy trống. Vui lòng quay lại sau!");
                 return;
             }
+
+            const mayChon = danhSachMay[0];
+
+            // Bước B: Tiến hành cập nhật sang 'da_ban' và lưu thời gian dưới dạng SỐ (int8)
+            const { error: loiCapNhat } = await _supabase
+                .from('kho_may')
+                .update({ 
+                    trang_thai: 'da_ban', 
+                    thoi_gian_ban: Date.now() // ĐÃ SỬA: Trả về số timestamp (Ví dụ: 1716... thích hợp với kiểu int8)
+                })
+                .eq('id', mayChon.id);
+
+            if (loiCapNhat) {
+                console.error("Lỗi cập nhật bảng Supabase:", loiCapNhat);
+                alert("Hệ thống bảo trì! Không thể cập nhật trạng thái máy.");
+                return;
+            }
+
+            // Bước C: Trừ tiền thành công và hiển thị kết quả
+            currentCoin -= 2;
+            localStorage.setItem('user_coins', currentCoin);
+            document.getElementById('coin-count').innerText = currentCoin;
+
+            const displayBox = document.getElementById('token-display');
+            displayBox.style.display = "block";
+            displayBox.innerHTML = `<strong>🎉 ĐỔI THÀNH CÔNG!</strong><br><br> MÃ MÁY CỦA BẠN LÀ:<br><code style="color: #00ff88;">${mayChon.token}</code>`;
+            
+            alert("Đổi máy thành công! Vui lòng copy mã ở khung viền xanh bên dưới màn hình.");
+
+        } catch (catchedError) {
+            console.error("Lỗi sập code JavaScript:", catchedError);
+            alert("Hệ thống gặp lỗi xử lý ngoài ý muốn!");
+        }
+    }
+</script>
+
+</body>
+</html>
 
             const mayChon = danhSachMay[0]; // Chọn máy đầu tiên tìm thấy
 
