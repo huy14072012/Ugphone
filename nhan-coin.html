@@ -15,27 +15,20 @@
         }
         .container {
             max-width: 450px;
-            margin: 60px auto;
+            margin: 80px auto;
             background: #1e1e1e;
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
         h2 { color: #ffcc00; }
-        .input-box {
-            width: 90%;
-            padding: 12px;
-            margin: 15px 0;
-            border: 2px solid #333;
-            border-radius: 8px;
-            background: #2a2a2a;
-            color: #fff;
-            font-size: 16px;
-            text-align: center;
-        }
-        .input-box:focus {
-            border-color: #ffcc00;
-            outline: none;
+        .notice {
+            background: #2d2d2d;
+            padding: 15px;
+            border-left: 4px solid #ffcc00;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 14px;
         }
         .btn-claim {
             width: 100%;
@@ -50,153 +43,81 @@
             transition: 0.3s;
         }
         .btn-claim:hover { background-color: #e6b800; }
-        .btn-disabled {
-            background-color: #555 !important;
-            color: #aaa !important;
-            cursor: not-allowed;
-        }
     </style>
 </head>
 <body>
 
 <div class="container" id="main-box">
-    <h2>🎉 VƯỢT LINK THÀNH CÔNG!</h2>
-    <p style="font-size: 14px; color: #aaa;">Vui lòng nhập chính xác Tên tài khoản của bạn để hệ thống kiểm tra và cộng 6 Coin.</p>
-    
-    <input type="text" id="username-input" class="input-box" placeholder="Nhập tên tài khoản của bạn...">
-    
-    <button class="btn-claim" id="btn-submit" onclick="xuLyNhanCoin()">💰 XÁC NHẬN NHẬN COIN</button>
+    <h2>🔄 ĐANG KIỂM TRA LƯỢT VƯỢT LINK...</h2>
+    <p style="color: #aaa;">Vui lòng đợi trong giây lát...</p>
 </div>
 
 <script>
-    // Kết nối đến Database Supabase của bạn
+    // Kết nối Supabase
     const SUPABASE_URL = "https://nigbaxusbacupefjkyud.supabase.co";
     const SUPABASE_KEY = "sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    async function xuLyNhanCoin() {
-        const username = document.getElementById('username-input').value.trim();
-        const btn = document.getElementById('btn-submit');
+    // Chạy kiểm tra ngay khi vừa đặt chân vào trang
+    kiemTraVaCongCoin();
 
-        if (!username) {
-            alert("Vui lòng không để trống tên tài khoản!");
-            return;
-        }
-
-        // Khóa nút bấm để tránh click liên tục
-        btn.disabled = true;
-        btn.classList.add('btn-disabled');
-        btn.innerText = "ĐANG KIỂM TRA...";
-
+    async function kiemTraVaCongCoin() {
         try {
-            // 1. Kiểm tra xem tài khoản này tồn tại trong bảng `tai_khoan` không
-            const { data: userExist, error: errCheckUser } = await _supabase
-                .from('tai_khoan')
+            // 1. Tìm xem trên Supabase có cái Token nào được tạo ra trong vòng 15 phút qua không
+            const thoiGianHetHan = Date.now() - (15 * 60 * 1000); // 15 phút
+            
+            const { data: danhSachToken, error: errToken } = await _supabase
+                .from('token_nhan_coin')
                 .select('*')
-                .eq('ten_dang_nhap', username)
-                .single();
+                .gt('thoi_gian_tao', thoiGianHetHan)
+                .limit(1);
 
-            if (errCheckUser || !userExist) {
-                alert("Tài khoản này không tồn tại trên hệ thống! Vui lòng nhập lại.");
-                btn.disabled = false;
-                btn.classList.remove('btn-disabled');
-                btn.innerText = "💰 XÁC NHẬN NHẬN COIN";
+            // NẾU KHÔNG CÓ TOKEN NÀO -> CHẶN LUÔN (Do vào lén hoặc đã dùng rồi)
+            if (errToken || !danhSachToken || danhSachToken.length === 0) {
+                hienLoi("Mã nhận thưởng không tồn tại hoặc đã hết hạn! Vui lòng quay lại trang chủ vượt link lại.");
                 return;
             }
 
-            // 2. Thử ghi nhận lịch sử nhận coin ngày hôm nay lên Supabase
-            // Nếu hôm nay acc này nhận rồi, Database sẽ báo lỗi trùng lặp (Unique Constraint) ngay lập tức
-            const homNay = new Date().toISOString().split('T')[0];
-            const { error: errInsertLichSu } = await _supabase
-                .from('lich_su_nhan_coin')
-                .insert([{ ten_dang_nhap: username, ngay_nhan: homNay }]);
+            const tokenHopLe = danhSachToken[0];
 
-            if (errInsertLichSu) {
-                // Nếu dính lỗi trùng tức là hôm nay đã nhận rồi! Chặn đứng!
-                document.getElementById('main-box').innerHTML = `
-                    <h2 style="color: #ff4d4d;">❌ TÀI KHOẢN ĐÃ NHẬN COIN!</h2>
-                    <p style="font-size: 15px; margin-top: 15px;">Tài khoản <strong style="color: #ffcc00;">${username}</strong> hôm nay đã nhận thưởng 6 coin rồi.</p>
-                    <p style="color: #aaa;">Mỗi nick chỉ được nhận tối đa 1 lần/ngày. Không thể gian lận!</p>
-                    <button class="btn-claim" style="background-color: #007bff; color: white; margin-top: 15px;" onclick="window.location.href='index.html'">Quay lại Trang Chủ</button>
-                `;
+            // 2. XÓA LUÔN TOKEN NÀY TRÊN SUPABASE (Xé vé - Chỉ cho dùng 1 lần)
+            const { error: errXoa } = await _supabase
+                .from('token_nhan_coin')
+                .delete()
+                .eq('id', tokenHopLe.id);
+
+            if (errXoa) {
+                hienLoi("Hệ thống trục trặc khi hủy mã xác thực!");
                 return;
             }
 
-            // 3. Nếu kiểm tra hợp lệ và chưa nhận -> Tiến hành cộng coin vào bảng `tai_khoan` trên Supabase
-            const coinMoi = (userExist.so_coin || 0) + 6;
-            const { error: errUpdateCoin } = await _supabase
-                .from('tai_khoan')
-                .update({ so_coin: coinMoi })
-                .eq('ten_dang_nhap', username);
+            // 3. TIẾN HÀNH CỘNG COIN VÀO MÁY NGƯỜI DÙNG (Lưu vào localStorage cũ của bạn)
+            let currentCoin = parseInt(localStorage.getItem('user_coins')) || 0;
+            currentCoin += 6;
+            localStorage.setItem('user_coins', currentCoin);
 
-            if (errUpdateCoin) {
-                alert("Lỗi cộng coin! Vui lòng liên hệ Admin.");
-                return;
-            }
+            // Giao diện thông báo thành công đẹp mắt
+            document.getElementById('main-box').innerHTML = `
+                <h2 style="color: #00ff88;">🎉 VƯỢT LINK THÀNH CÔNG!</h2>
+                <div class="notice">
+                    <strong>Hệ thống xác nhận:</strong> Mã token hợp lệ. Đã cộng thành công <strong>+6 Coin</strong> vào ví trên máy của bạn!
+                </div>
+                <button class="btn-claim" style="background-color: #007bff; color: white;" onclick="window.location.href='index.html'">Quay lại Trang Chủ</button>
+            `;
 
-            // Cũng đồng thời lưu vào máy để đồng bộ giao diện trang chủ
-            localStorage.setItem('user_coins', coinMoi);
-
-            alert(`Chúc mừng nick ${username} đã được cộng +6 Coin thành công trên hệ thống!`);
-            window.location.href = "index.html";
+            alert("Bạn được cộng +6 Coin!");
 
         } catch (e) {
-            alert("Lỗi hệ thống ngoài ý muốn!");
-            btn.disabled = false;
-            btn.classList.remove('btn-disabled');
-            btn.innerText = "💰 XÁC NHẬN NHẬN COIN";
+            hienLoi("Lỗi xử lý hệ thống ngoài ý muốn!");
         }
     }
-</script>
 
-</body>
-</html>
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .btn-claim:hover { background-color: #e6b800; }
-    </style>
-</head>
-<body>
-
-<div class="container" id="main-box">
-    <h2>🎉 VƯỢT LINK THÀNH CÔNG!</h2>
-    <div class="notice">
-        <strong>Chúc mừng bạn!</strong> Bạn đã hoàn thành nhiệm vụ vượt link quảng cáo. Bấm nút bên dưới để cộng 6 Coin vào ví.
-    </div>
-    
-    <button class="btn-claim" onclick="congCoin()">💰 NHẬN 6 COIN NGAY</button>
-</div>
-
-<script>
-    // Kiểm tra xem trong phiên truy cập này người dùng đã bấm nhận coin chưa
-    const daNhanTrongPhien = sessionStorage.getItem('da_nhan_coin_phien_nay');
-
-    // NẾU ĐÃ NHẬN RỒI -> KHÓA LUÔN, BẤM LẦN 2 SẼ BỊ CHẶN
-    if (daNhanTrongPhien === 'true') {
+    function hienLoi(noiDung) {
         document.getElementById('main-box').innerHTML = `
-            <h2 style="color: #ff4d4d;">❌ LƯỢT NHẬN ĐÃ HẾT HẠN!</h2>
-            <p style="font-size: 15px; margin-top: 15px; color: #aaa;">Mỗi lần vượt link bạn chỉ được bấm nút nhận coin đúng 1 lần duy nhất.</p>
-            <p style="color: #ffcc00; font-weight: bold;">Vui lòng quay lại trang chủ và thực hiện lượt vượt link mới!</p>
-            <button class="btn-claim" style="background-color: #007bff; color: white; margin-top: 15px;" onclick="window.location.href='index.html'">Quay lại Trang Chủ</button>
+            <h2 style="color: #ff4d4d;">❌ TRUY CẬP BỊ TỪ CHỐI!</h2>
+            <p style="font-size: 15px; margin-top: 15px; color: #aaa;">${noiDung}</p>
+            <button class="btn-claim" style="background-color: #dc3545; color: white; margin-top: 15px;" onclick="window.location.href='index.html'">Quay lại Trang Chủ</button>
         `;
-    }
-
-    function congCoin() {
-        // Đánh dấu ngay lập tức là đã nhận coin rồi
-        sessionStorage.setItem('da_nhan_coin_phien_nay', 'true');
-
-        // Cộng coin vào ví máy người dùng
-        let currentCoin = parseInt(localStorage.getItem('user_coins')) || 0;
-        currentCoin += 6;
-        localStorage.setItem('user_coins', currentCoin);
-        
-        alert("Đã cộng 6 Coin vào tài khoản của bạn!");
-        window.location.href = "index.html"; 
     }
 </script>
 
