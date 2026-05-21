@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống UgPhone - Đăng Nhập</title>
+    <title>Cày Coin Đổi Mã UgPhone</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body {
@@ -21,259 +21,19 @@
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
-        h2 { color: #00ff88; font-size: 22px; margin-bottom: 20px; }
+        h2 { 
+            color: #00ff88; 
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
         .coin-box {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: bold;
-            margin: 15px 0;
+            margin: 20px 0;
             color: #ffcc00;
             background: #2a2a2a;
-            padding: 12px;
+            padding: 15px;
             border-radius: 10px;
-            display: inline-block;
-            min-width: 200px;
-        }
-        .input-group {
-            margin: 15px 0;
-            text-align: left;
-        }
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #aaa;
-            font-size: 14px;
-        }
-        .input-box {
-            width: 100%;
-            padding: 12px;
-            box-sizing: border-box;
-            border: 2px solid #333;
-            border-radius: 8px;
-            background: #2a2a2a;
-            color: #fff;
-            font-size: 16px;
-        }
-        .input-box:focus { border-color: #00ff88; outline: none; }
-        button {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .btn-primary { background-color: #007bff; color: white; }
-        .btn-primary:hover { background-color: #0056b3; }
-        .btn-success { background-color: #28a745; color: white; }
-        .btn-success:hover { background-color: #218838; }
-        .btn-danger { background-color: #dc3545; color: white; padding: 8px; font-size: 13px; width: auto; margin-top: 5px;}
-        .btn-danger:hover { background-color: #bd2130; }
-        
-        .token-box {
-            margin-top: 25px;
-            padding: 20px;
-            background: #252525;
-            border: 2px dashed #00ff88;
-            border-radius: 10px;
-            display: none;
-            text-align: center;
-        }
-        .btn-cloud {
-            background: linear-gradient(45deg, #00c6ff, #0072ff);
-            color: white;
-            font-size: 16px;
-            margin-top: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(0, 198, 255, 0.4);
-        }
-        .btn-cloud:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 20px rgba(0, 198, 255, 0.6);
-        }
-        .toggle-text {
-            color: #00ff88;
-            cursor: pointer;
-            text-decoration: underline;
-            font-size: 14px;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div id="auth-box">
-        <h2 id="auth-title">ĐĂNG NHẬP HỆ THỐNG</h2>
-        
-        <div class="input-group">
-            <label>Tên tài khoản</label>
-            <input type="text" id="auth-username" class="input-box" placeholder="Nhập tài khoản...">
-        </div>
-        
-        <div class="input-group">
-            <label>Mật khẩu</label>
-            <input type="password" id="auth-password" class="input-box" placeholder="Nhập mật khẩu...">
-        </div>
-        
-        <button class="btn-primary" id="btn-main-auth" onclick="handleAuth()">Đăng Nhập Ngay</button>
-        
-        <p style="font-size: 14px; color: #aaa;" id="toggle-wrapper">
-            Chưa có tài khoản? <span class="toggle-text" onclick="switchAuthMode(true)">Đăng ký tại đây</span>
-        </p>
-    </div>
-
-    <div id="main-app-box" style="display: none;">
-        <h2>HỆ THỐNG ĐỔI MÁY UGPHONE</h2>
-        <p style="color: #aaa; margin: 0;">Xin chào, <strong id="user-display" style="color: #00ff88;">...</strong></p>
-        <button class="btn-danger" onclick="dangXuat()">🔒 Đăng xuất</button>
-        <br><br>
-        
-        <div class="coin-box">Ví của bạn: <span id="coin-count">0</span> COIN</div>
-        
-        <button class="btn-primary" onclick="vuotLink()">🔗 VƯỢT LINK NHẬN COIN (+6 COIN)</button>
-        <button class="btn-success" onclick="doiMay()">🎁 ĐỔI MÁY NGAY (Tốn 2 Coin)</button>
-        
-        <div id="token-display" class="token-box"></div>
-    </div>
-</div>
-
-<script>
-    // Kết nối Supabase
-    const SUPABASE_URL = "https://nigbaxusbacupefjkyud.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    let isRegisterMode = false; 
-    let loggedInUser = localStorage.getItem('logged_in_user') || null;
-
-    // Kiểm tra trạng thái đăng nhập khi tải trang
-    if (loggedInUser) {
-        loadUserData(loggedInUser);
-    }
-
-    // Chuyển đổi giữa Đăng ký và Đăng nhập
-    function switchAuthMode(toRegister) {
-        isRegisterMode = toRegister;
-        if (isRegisterMode) {
-            document.getElementById('auth-title').innerText = "ĐĂNG KÝ TÀI KHOẢN MỚI";
-            document.getElementById('btn-main-auth').innerText = "Đăng Ký Tài Khoản";
-            document.getElementById('toggle-wrapper').innerHTML = `Đã có tài khoản? <span class="toggle-text" onclick="switchAuthMode(false)">Đăng nhập tại đây</span>`;
-        } else {
-            document.getElementById('auth-title').innerText = "ĐĂNG NHẬP HỆ THỐNG";
-            document.getElementById('btn-main-auth').innerText = "Đăng Nhập Ngay";
-            document.getElementById('toggle-wrapper').innerHTML = `Chưa có tài khoản? <span class="toggle-text" onclick="switchAuthMode(true)">Đăng ký tại đây</span>`;
-        }
-    }
-
-    // Xử lý nút bấm Đăng nhập hoặc Đăng ký
-    async function handleAuth() {
-        const user = document.getElementById('auth-username').value.trim();
-        const pass = document.getElementById('auth-password').value.trim();
-
-        if (!user || !pass) {
-            alert("Vui lòng điền đầy đủ tài khoản và mật khẩu!");
-            return;
-        }
-
-        if (isRegisterMode) {
-            // ĐĂNG KÝ
-            const { data: checkUser } = await _supabase.from('tai_khoan').select('*').eq('ten_dang_nhap', user);
-            if (checkUser && checkUser.length > 0) {
-                alert("Tên tài khoản này đã có người sử dụng!");
-                return;
-            }
-
-            const { error: errReg } = await _supabase.from('tai_khoan').insert([{ ten_dang_nhap: user, mat_khau: pass, so_coin: 0 }]);
-            if (errReg) {
-                alert("Đăng ký thất bại! Lỗi kết nối database.");
-            } else {
-                alert("Đăng ký thành công! Bạn có thể đăng nhập ngay bây giờ.");
-                switchAuthMode(false);
-            }
-        } else {
-            // ĐĂNG NHẬP
-            const { data: userData, error } = await _supabase.from('tai_khoan').select('*').eq('ten_dang_nhap', user).eq('mat_khau', pass);
-            if (error || !userData || userData.length === 0) {
-                alert("Sai tài khoản hoặc mật khẩu!");
-            } else {
-                localStorage.setItem('logged_in_user', user);
-                loadUserData(user);
-            }
-        }
-    }
-
-    // Tải dữ liệu Coin từ database lên màn hình
-    async function loadUserData(username) {
-        const { data: uData } = await _supabase.from('tai_khoan').select('*').eq('ten_dang_nhap', username).single();
-        if (uData) {
-            document.getElementById('auth-box').style.display = 'none';
-            document.getElementById('main-app-box').style.display = 'block';
-            document.getElementById('user-display').innerText = uData.ten_dang_nhap;
-            document.getElementById('coin-count').innerText = uData.so_coin || 0;
-            loggedInUser = username;
-        }
-    }
-
-    // Đăng xuất
-    function dangXuat() {
-        localStorage.removeItem('logged_in_user');
-        location.reload(); 
-    }
-
-    // Vượt link kiếm coin
-    function vuotLink() {
-        window.location.href = "https://link4m.net/ZG7hvw"; 
-    }
-
-    // Đổi máy và hiện nút đám mây dẫn đến trang auto
-    async function doiMay() {
-        const { data: currentData } = await _supabase.from('tai_khoan').select('*').eq('ten_dang_nhap', loggedInUser).single();
-        let userCoin = currentData ? currentData.so_coin : 0;
-
-        if (userCoin < 2) {
-            alert("Bạn không đủ số dư Coin để đổi máy!");
-            return;
-        }
-
-        try {
-            const { data: danhSachMay, error: loiLayMay } = await _supabase.from('kho_may').select('*').eq('trang_thai', 'trong').limit(1);
-            if (loiLayMay || !danhSachMay || danhSachMay.length === 0) {
-                alert("Hiện tại hệ thống đã hết sạch máy trống!");
-                return;
-            }
-
-            const mayChon = danhSachMay[0];
-            await _supabase.from('kho_may').update({ trang_thai: 'da_ban', thoi_gian_ban: Date.now() }).eq('id', mayChon.id);
-            
-            let coinMoi = userCoin - 2;
-            await _supabase.from('tai_khoan').update({ so_coin: coinMoi }).eq('ten_dang_nhap', loggedInUser);
-            document.getElementById('coin-count').innerText = coinMoi;
-
-            const displayBox = document.getElementById('token-display');
-            displayBox.style.display = "block";
-            displayBox.innerHTML = `
-                <strong style="color: #00ff88; font-size: 18px;">🎉 ĐỔI MÁY THÀNH CÔNG!</strong>
-                <p style="font-size: 14px; margin: 10px 0; color: #eee;">Đã trừ 2 Coin trong tài khoản của bạn.</p>
-                <a href="https://clientclone.ayabloxtraicay.site/autobuyugphone.php" target="_blank" style="text-decoration: none;">
-                    <button class="btn-cloud" style="width: 100%;">
-                        ☁️ auto mua máy và quick login code
-                    </button>
-                </a>
-            `;
-            alert("Đổi máy thành công!");
-        } catch (e) {
-            alert("Hệ thống gặp lỗi xử lý ngoài ý muốn!");
-        }
-    }
-</script>
-
-</body>
-</html>
             display: inline-block;
             min-width: 200px;
         }
@@ -353,11 +113,11 @@
     const SUPABASE_KEY = "sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Lấy số dư Coin hiện tại từ thiết bị người dùng
+    // Lấy số dư Coin tự động lưu trên máy người dùng
     let currentCoin = parseInt(localStorage.getItem('user_coins')) || 0;
     document.getElementById('coin-count').innerText = currentCoin;
 
-    // Hàm xử lý tạo token chống hack và chuyển hướng qua Link4M
+    // Tạo token chống hack và đá qua link rút gọn Link4M
     async function vuotLink() {
         const btn = document.getElementById('btn-vuot-link');
         btn.disabled = true;
@@ -365,10 +125,10 @@
         btn.innerText = "⏳ ĐANG KHỞI TẠO LƯỢT CHƠI...";
 
         try {
-            // Tạo ra một chuỗi mã ngẫu nhiên duy nhất
+            // Tạo mã token ngẫu nhiên
             const maNgauNhien = "TOKEN_" + Math.floor(Math.random() * 900000 + 100000);
             
-            // Gửi mã này lên bảng token_nhan_coin trên Supabase làm bằng chứng hợp lệ
+            // Đẩy lên bảng token_nhan_coin trên Supabase làm chứng cứ
             await _supabase
                 .from('token_nhan_coin')
                 .insert([{ ma_token: maNgauNhien, thoi_gian_tao: Date.now() }]);
@@ -377,11 +137,11 @@
             console.log("Lỗi đồng bộ token bảo mật.");
         }
 
-        // Chuyển sang link rút gọn kiếm tiền của bạn
+        // Đi đến link rút gọn của bạn
         window.location.href = "https://link4m.net/ZG7hvw"; 
     }
 
-    // Hàm xử lý đổi máy lấy liên kết Auto
+    // Xử lý đổi máy
     async function doiMay() {
         if (currentCoin < 2) {
             alert("Bạn không đủ số dư! Vui lòng bấm 'Vượt link' để kiếm thêm Coin nhé.");
@@ -389,7 +149,7 @@
         }
 
         try {
-            // Bước A: Tìm máy trống từ kho dữ liệu
+            // Lấy 1 máy trống trong kho_may
             const { data: danhSachMay, error: loiLayMay } = await _supabase
                 .from('kho_may')
                 .select('*')
@@ -403,7 +163,7 @@
 
             const mayChon = danhSachMay[0];
 
-            // Bước B: Cập nhật trạng thái máy thành đã bán
+            // Đổi trạng thái máy thành da_ban
             const { error: loiCapNhat } = await _supabase
                 .from('kho_may')
                 .update({ 
@@ -413,358 +173,16 @@
                 .eq('id', mayChon.id);
 
             if (loiCapNhat) {
-                alert("Hệ thống bảo trì! Không thể cập nhật trạng thái máy trên database.");
+                alert("Hệ thống bảo trì! Không thể đổi trạng thái máy.");
                 return;
             }
 
-            // Bước C: Khấu trừ Coin trên máy người dùng
+            // Trừ 2 Coin trực tiếp trong bộ nhớ máy
             currentCoin -= 2;
             localStorage.setItem('user_coins', currentCoin);
             document.getElementById('coin-count').innerText = currentCoin;
 
-            // Bước D: Hiển thị nút bấm đám mây liên kết trực tiếp với trang Web Auto
-            const displayBox = document.getElementById('token-display');
-            displayBox.style.display = "block";
-            
-            displayBox.innerHTML = `
-                <strong style="color: #00ff88; font-size: 18px;">🎉 ĐỔI MÁY THÀNH CÔNG!</strong>
-                <p style="font-size: 14px; margin: 10px 0; color: #eee;">Đã trừ 2 Coin trong ví của bạn.</p>
-                <a href="https://clientclone.ayabloxtraicay.site/autobuyugphone.php" target="_blank" style="text-decoration: none;">
-                    <button class="btn-cloud">
-                        ☁️ auto mua máy và quick login code
-                    </button>
-                </a>
-            `;
-            
-            alert("Đổi máy thành công!");
-
-        } catch (catchedError) {
-            alert("Hệ thống gặp lỗi xử lý ngoài ý muốn!");
-        }
-    }
-</script>
-
-</body>
-</html>
-            margin: 15px 0;
-            text-align: left;
-        }
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #aaa;
-            font-size: 14px;
-        }
-        .input-box {
-            width: 100%;
-            padding: 12px;
-            box-sizing: border-box;
-            border: 2px solid #333;
-            border-radius: 8px;
-            background: #2a2a2a;
-            color: #fff;
-            font-size: 16px;
-        }
-        .input-box:focus { border-color: #00ff88; outline: none; }
-        button {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .btn-primary { background-color: #007bff; color: white; }
-        .btn-primary:hover { background-color: #0056b3; }
-        .btn-success { background-color: #28a745; color: white; }
-        .btn-success:hover { background-color: #218838; }
-        .btn-danger { background-color: #dc3545; color: white; padding: 8px; font-size: 13px; width: auto; margin-top: 5px;}
-        .btn-danger:hover { background-color: #bd2130; }
-        
-        .token-box {
-            margin-top: 25px;
-            padding: 20px;
-            background: #252525;
-            border: 2px dashed #00ff88;
-            border-radius: 10px;
-            display: none;
-        }
-        .btn-cloud {
-            background: linear-gradient(45deg, #00c6ff, #0072ff);
-            color: white;
-        }
-        .toggle-text {
-            color: #00ff88;
-            cursor: pointer;
-            text-decoration: underline;
-            font-size: 14px;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div id="auth-box">
-        <h2 id="auth-title">ĐĂNG NHẬP HỆ THỐNG</h2>
-        
-        <div class="input-group">
-            <label>Tên tài khoản</label>
-            <input type="text" id="auth-username" class="input-box" placeholder="Nhập tài khoản...">
-        </div>
-        
-        <div class="input-group">
-            <label>Mật khẩu</label>
-            <input type="password" id="auth-password" class="input-box" placeholder="Nhập mật khẩu...">
-        </div>
-        
-        <button class="btn-primary" id="btn-main-auth" onclick="handleAuth()">Đăng Nhập Ngay</button>
-        
-        <p style="font-size: 14px; color: #aaa;" id="toggle-wrapper">
-            Chưa có tài khoản? <span class="toggle-text" onclick="switchAuthMode(true)">Đăng ký tại đây</span>
-        </p>
-    </div>
-
-    <div id="main-app-box" style="display: none;">
-        <h2>HỆ THỐNG ĐỔI MÁY UGPHONE</h2>
-        <p style="color: #aaa; margin: 0;">Xin chào, <strong id="user-display" style="color: #00ff88;">...</strong></p>
-        <button class="btn-danger" onclick="dangXuat()">🔒 Đăng xuất</button>
-        <br><br>
-        
-        <div class="coin-box">Ví của bạn: <span id="coin-count">0</span> COIN</div>
-        
-        <button class="btn-primary" onclick="vuotLink()">🔗 VƯỢT LINK NHẬN COIN (+6 COIN)</button>
-        <button class="btn-success" onclick="doiMay()">🎁 ĐỔI MÁY NGAY (Tốn 2 Coin)</button>
-        
-        <div id="token-display" class="token-box"></div>
-    </div>
-</div>
-
-<script>
-    // Cấu hình kết nối Supabase
-    const SUPABASE_URL = "https://nigbaxusbacupefjkyud.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    let isRegisterMode = false; // Trạng thái Đăng nhập hay Đăng ký
-    let loggedInUser = localStorage.getItem('logged_in_user') || null;
-
-    // Tự động kiểm tra nếu đã đăng nhập từ trước
-    if (loggedInUser) {
-        loadUserData(loggedInUser);
-    }
-
-    // Hàm chuyển đổi qua lại giữa Đăng nhập và Đăng ký
-    function switchAuthMode(toRegister) {
-        isRegisterMode = toRegister;
-        if (isRegisterMode) {
-            document.getElementById('auth-title').innerText = "ĐĂNG KÝ TÀI KHOẢN MỚI";
-            document.getElementById('btn-main-auth').innerText = "Đăng Ký Tài Khoản";
-            document.getElementById('toggle-wrapper').innerHTML = `Đã có tài khoản? <span class="toggle-text" onclick="switchAuthMode(false)">Đăng nhập tại đây</span>`;
-        } else {
-            document.getElementById('auth-title').innerText = "ĐĂNG NHẬP HỆ THỐNG";
-            document.getElementById('btn-main-auth').innerText = "Đăng Nhập Ngay";
-            document.getElementById('toggle-wrapper').innerHTML = `Chưa có tài khoản? <span class="toggle-text" onclick="switchAuthMode(true)">Đăng ký tại đây</span>`;
-        }
-    }
-
-    // Xử lý nút bấm Đăng nhập / Đăng ký
-    async function handleAuth() {
-        const user = document.getElementById('auth-username').value.trim();
-        const pass = document.getElementById('auth-password').value.trim();
-
-        if (!user || !pass) {
-            alert("Vui lòng điền đầy đủ tài khoản và mật khẩu!");
-            return;
-        }
-
-        if (isRegisterMode) {
-            // XỬ LÝ ĐĂNG KÝ
-            const { data: checkUser } = await _supabase.from('tai_khoan').select('*').eq('ten_dang_nhap', user);
-            if (checkUser && checkUser.length > 0) {
-                alert("Tên tài khoản này đã có người sử dụng!");
-                return;
-            }
-
-            const { error: errReg } = await _supabase.from('tai_khoan').insert([{ ten_dang_nhap: user, mat_khau: pass, so_coin: 0 }]);
-            if (errReg) {
-                alert("Đăng ký thất bại! Lỗi kết nối.");
-            } else {
-                alert("Đăng ký thành công! Hãy đăng nhập nhé.");
-                switchAuthMode(false);
-            }
-        } else {
-            // XỬ LÝ ĐĂNG NHẬP
-            const { data: userData, error } = await _supabase.from('tai_khoan').select('*').eq('ten_dang_nhap', user).eq('mat_khau', pass);
-            if (error || !userData || userData.length === 0) {
-                alert("Sai tài khoản hoặc mật khẩu!");
-            } else {
-                localStorage.setItem('logged_in_user', user);
-                loadUserData(user);
-            }
-        }
-    }
-
-    // Lấy dữ liệu Coin của tài khoản từ Supabase đổ lên giao diện
-    async function loadUserData(username) {
-        const { data: uData } = await _supabase.from('tai_khoan').select('*').eq('ten_dang_nhap', username).single();
-        if (uData) {
-            document.getElementById('auth-box').style.display = 'none';
-            document.getElementById('main-app-box').style.display = 'block';
-            document.getElementById('user-display').innerText = uData.ten_dang_nhap;
-            document.getElementById('coin-count').innerText = uData.so_coin || 0;
-            loggedInUser = username;
-        }
-    }
-
-    // Hàm Đăng Xuất
-    function dangXuat() {
-        localStorage.removeItem('logged_in_user');
-        location.reload(); // Tải lại trang để quay về màn hình Đăng nhập ban đầu
-    }
-
-    function vuotLink() {
-        window.location.href = "https://link4m.net/ZG7hvw"; 
-    }
-
-    // Xử lý đổi máy (Trừ coin trực tiếp trên Supabase)
-    async function doiMay() {
-        const { data: currentData } = await _supabase.from('tai_khoan').select('*').eq('ten_dang_nhap', loggedInUser).single();
-        let userCoin = currentData ? currentData.so_coin : 0;
-
-        if (userCoin < 2) {
-            alert("Bạn không đủ số dư Coin!");
-            return;
-        }
-
-        try {
-            const { data: danhSachMay, error: loiLayMay } = await _supabase.from('kho_may').select('*').eq('trang_thai', 'trong').limit(1);
-            if (loiLayMay || !danhSachMay || danhSachMay.length === 0) {
-                alert("Hết sạch máy trống rồi bạn ơi!");
-                return;
-            }
-
-            const mayChon = danhSachMay[0];
-            await _supabase.from('kho_may').update({ trang_thai: 'da_ban', thoi_gian_ban: Date.now() }).eq('id', mayChon.id);
-            
-            // Trừ coin trên Supabase
-            let coinMoi = userCoin - 2;
-            await _supabase.from('tai_khoan').update({ so_coin: coinMoi }).eq('ten_dang_nhap', loggedInUser);
-            document.getElementById('coin-count').innerText = coinMoi;
-
-            const displayBox = document.getElementById('token-display');
-            displayBox.style.display = "block";
-            displayBox.innerHTML = `
-                <strong style="color: #00ff88; font-size: 18px;">🎉 ĐỔI MÁY THÀNH CÔNG!</strong>
-                <p style="font-size: 14px; margin: 10px 0; color: #eee;">Đã trừ 2 Coin trong tài khoản của bạn.</p>
-                <a href="https://clientclone.ayabloxtraicay.site/autobuyugphone.php" target="_blank" style="text-decoration: none;">
-                    <button class="btn-cloud" style="width:100%;">☁️ auto mua máy và quick login code</button>
-                </a>
-            `;
-            alert("Đổi máy thành công!");
-        } catch (e) {
-            alert("Lỗi hệ thống!");
-        }
-    }
-</script>
-
-</body>
-</html>
-            background: #252525;
-            border: 2px dashed #00ff88;
-            border-radius: 10px;
-            display: none;
-            text-align: center;
-        }
-        .btn-cloud {
-            background: linear-gradient(45deg, #00c6ff, #0072ff);
-            color: white;
-            font-size: 16px;
-            margin-top: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(0, 198, 255, 0.4);
-        }
-        .btn-cloud:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 20px rgba(0, 198, 255, 0.6);
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h2>HỆ THỐNG ĐỔI MÁY UGPHONE</h2>
-    
-    <div class="coin-box">Ví của bạn: <span id="coin-count">0</span> COIN</div>
-    
-    <button class="btn-link" onclick="vuotLink()">🔗 VƯỢT LINK NHẬN COIN (+6 COIN)</button>
-    
-    <button class="btn-exchange" onclick="doiMay()">🎁 ĐỔI MÁY NGAY (Tốn 2 Coin)</button>
-    
-    <div id="token-display" class="token-box"></div>
-</div>
-
-<script>
-    // Kết nối Supabase
-    const SUPABASE_URL = "https://nigbaxusbacupefjkyud.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    // Lấy số dư Coin
-    let currentCoin = parseInt(localStorage.getItem('user_coins')) || 0;
-    document.getElementById('coin-count').innerText = currentCoin;
-
-    function vuotLink() {
-        // Đưa người dùng đến link rút gọn kiếm tiền của bạn
-        window.location.href = "https://link4m.net/ZG7hvw"; 
-    }
-
-    async function doiMay() {
-        if (currentCoin < 2) {
-            alert("Bạn không đủ số dư! Vui lòng bấm 'Vượt link' để kiếm thêm Coin nhé.");
-            return;
-        }
-
-        try {
-            // Bước A: Tìm máy trống
-            const { data: danhSachMay, error: loiLayMay } = await _supabase
-                .from('kho_may')
-                .select('*')
-                .eq('trang_thai', 'trong')
-                .limit(1);
-
-            if (loiLayMay || !danhSachMay || danhSachMay.length === 0) {
-                alert("Hệ thống đang bảo trì hoặc hiện tại đã hết sạch máy trống!");
-                return;
-            }
-
-            const mayChon = danhSachMay[0];
-
-            // Bước B: Cập nhật trạng thái máy
-            const { error: loiCapNhat } = await _supabase
-                .from('kho_may')
-                .update({ 
-                    trang_thai: 'da_ban', 
-                    thoi_gian_ban: Date.now()
-                })
-                .eq('id', mayChon.id);
-
-            if (loiCapNhat) {
-                alert("Hệ thống bảo trì! Không thể cập nhật trạng thái máy trên database.");
-                return;
-            }
-
-            // Bước C: Trừ coin
-            currentCoin -= 2;
-            localStorage.setItem('user_coins', currentCoin);
-            document.getElementById('coin-count').innerText = currentCoin;
-
-            // Bước D: Hiển thị nút đám mây và link auto mua máy
+            // Hiện nút đám mây nhảy sang web auto mua máy
             const displayBox = document.getElementById('token-display');
             displayBox.style.display = "block";
             
