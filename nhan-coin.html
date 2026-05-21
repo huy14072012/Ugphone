@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xác Nhận Nhận Coin</title>
+    <title>Xác Nhận Nhận Coin Chống Hack</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -14,26 +15,142 @@
         }
         .container {
             max-width: 450px;
-            margin: 80px auto;
+            margin: 60px auto;
             background: #1e1e1e;
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
         h2 { color: #ffcc00; }
-        .notice {
-            background: #2d2d2d;
-            padding: 15px;
-            border-left: 4px solid #ffcc00;
-            margin: 20px 0;
-            text-align: left;
-            font-size: 14px;
+        .input-box {
+            width: 90%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: #2a2a2a;
+            color: #fff;
+            font-size: 16px;
+            text-align: center;
+        }
+        .input-box:focus {
+            border-color: #ffcc00;
+            outline: none;
         }
         .btn-claim {
             width: 100%;
             padding: 14px;
             background-color: #ffcc00;
             color: #000000;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-claim:hover { background-color: #e6b800; }
+        .btn-disabled {
+            background-color: #555 !important;
+            color: #aaa !important;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="main-box">
+    <h2>🎉 VƯỢT LINK THÀNH CÔNG!</h2>
+    <p style="font-size: 14px; color: #aaa;">Vui lòng nhập chính xác Tên tài khoản của bạn để hệ thống kiểm tra và cộng 6 Coin.</p>
+    
+    <input type="text" id="username-input" class="input-box" placeholder="Nhập tên tài khoản của bạn...">
+    
+    <button class="btn-claim" id="btn-submit" onclick="xuLyNhanCoin()">💰 XÁC NHẬN NHẬN COIN</button>
+</div>
+
+<script>
+    // Kết nối đến Database Supabase của bạn
+    const SUPABASE_URL = "https://nigbaxusbacupefjkyud.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function xuLyNhanCoin() {
+        const username = document.getElementById('username-input').value.trim();
+        const btn = document.getElementById('btn-submit');
+
+        if (!username) {
+            alert("Vui lòng không để trống tên tài khoản!");
+            return;
+        }
+
+        // Khóa nút bấm để tránh click liên tục
+        btn.disabled = true;
+        btn.classList.add('btn-disabled');
+        btn.innerText = "ĐANG KIỂM TRA...";
+
+        try {
+            // 1. Kiểm tra xem tài khoản này tồn tại trong bảng `tai_khoan` không
+            const { data: userExist, error: errCheckUser } = await _supabase
+                .from('tai_khoan')
+                .select('*')
+                .eq('ten_dang_nhap', username)
+                .single();
+
+            if (errCheckUser || !userExist) {
+                alert("Tài khoản này không tồn tại trên hệ thống! Vui lòng nhập lại.");
+                btn.disabled = false;
+                btn.classList.remove('btn-disabled');
+                btn.innerText = "💰 XÁC NHẬN NHẬN COIN";
+                return;
+            }
+
+            // 2. Thử ghi nhận lịch sử nhận coin ngày hôm nay lên Supabase
+            // Nếu hôm nay acc này nhận rồi, Database sẽ báo lỗi trùng lặp (Unique Constraint) ngay lập tức
+            const homNay = new Date().toISOString().split('T')[0];
+            const { error: errInsertLichSu } = await _supabase
+                .from('lich_su_nhan_coin')
+                .insert([{ ten_dang_nhap: username, ngay_nhan: homNay }]);
+
+            if (errInsertLichSu) {
+                // Nếu dính lỗi trùng tức là hôm nay đã nhận rồi! Chặn đứng!
+                document.getElementById('main-box').innerHTML = `
+                    <h2 style="color: #ff4d4d;">❌ TÀI KHOẢN ĐÃ NHẬN COIN!</h2>
+                    <p style="font-size: 15px; margin-top: 15px;">Tài khoản <strong style="color: #ffcc00;">${username}</strong> hôm nay đã nhận thưởng 6 coin rồi.</p>
+                    <p style="color: #aaa;">Mỗi nick chỉ được nhận tối đa 1 lần/ngày. Không thể gian lận!</p>
+                    <button class="btn-claim" style="background-color: #007bff; color: white; margin-top: 15px;" onclick="window.location.href='index.html'">Quay lại Trang Chủ</button>
+                `;
+                return;
+            }
+
+            // 3. Nếu kiểm tra hợp lệ và chưa nhận -> Tiến hành cộng coin vào bảng `tai_khoan` trên Supabase
+            const coinMoi = (userExist.so_coin || 0) + 6;
+            const { error: errUpdateCoin } = await _supabase
+                .from('tai_khoan')
+                .update({ so_coin: coinMoi })
+                .eq('ten_dang_nhap', username);
+
+            if (errUpdateCoin) {
+                alert("Lỗi cộng coin! Vui lòng liên hệ Admin.");
+                return;
+            }
+
+            // Cũng đồng thời lưu vào máy để đồng bộ giao diện trang chủ
+            localStorage.setItem('user_coins', coinMoi);
+
+            alert(`Chúc mừng nick ${username} đã được cộng +6 Coin thành công trên hệ thống!`);
+            window.location.href = "index.html";
+
+        } catch (e) {
+            alert("Lỗi hệ thống ngoài ý muốn!");
+            btn.disabled = false;
+            btn.classList.remove('btn-disabled');
+            btn.innerText = "💰 XÁC NHẬN NHẬN COIN";
+        }
+    }
+</script>
+
+</body>
+</html>
             border: none;
             border-radius: 8px;
             font-size: 18px;
