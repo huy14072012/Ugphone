@@ -3,68 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cày Coin Đổi Mã UgPhone</title>
+    <title>Hệ Thống Đổi Máy UgPhone</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body {
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
             background-color: #121212;
             color: #ffffff;
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             padding: 20px;
         }
+
         .container {
-            max-width: 500px;
-            margin: 40px auto;
-            background: #1e1e1e;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-        h2 { 
-            color: #00ff88; 
-            font-size: 22px;
-            margin-bottom: 20px;
-        }
-        .coin-box {
-            font-size: 26px;
-            font-weight: bold;
-            margin: 20px 0;
-            color: #ffcc00;
-            background: #2a2a2a;
-            padding: 15px;
-            border-radius: 10px;
-            display: inline-block;
-            min-width: 200px;
-        }
-        button {
+            background-color: #1e1e1e;
             width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            max-width: 450px;
+            border-radius: 15px;
+            padding: 30px 20px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .title {
+            color: #00ff66;
+            font-size: 22px;
             font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .btn-link { 
-            background-color: #007bff; 
-            color: white; 
-        }
-        .btn-link:hover { 
-            background-color: #0056b3; 
-        }
-        .btn-exchange { 
-            background-color: #28a745; 
-            color: white; 
-        }
-        .btn-exchange:hover { 
-            background-color: #218838; 
-        }
-        .token-box {
-            margin-top: 25px;
-            padding: 20px;
+
+        .wallet-box
             background: #252525;
             border: 2px dashed #00ff88;
             border-radius: 10px;
