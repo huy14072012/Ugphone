@@ -3,32 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đang xử lý cộng Coin...</title>
+    <title>Xác Nhận Nhận Coin</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #0b0f19; color: #e2e8f0; display: flex; justify-content: center; align-items: center; height: 100vh; text-align: center; }
-        .loading-box { background: #1f2937; padding: 30px; border-radius: 12px; border: 1px solid #374151; max-width: 400px; width: 90%; }
-        h2 { color: #10b981; margin-bottom: 10px; }
-        p { color: #94a3b8; font-size: 14px; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 450px;
+            margin: 80px auto;
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        h2 { color: #ffcc00; }
+        .notice {
+            background: #2d2d2d;
+            padding: 15px;
+            border-left: 4px solid #ffcc00;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 14px;
+        }
+        .btn-claim {
+            width: 100%;
+            padding: 14px;
+            background-color: #ffcc00;
+            color: #000000;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-claim:hover { background-color: #e6b800; }
     </style>
 </head>
 <body>
 
-    <div class="loading-box">
-        <h2>💰 Đang cộng +6 Coin...</h2>
-        <p>Hệ thống đang xác thực lượt vượt link của bạn và tự động đưa bạn quay lại trang chủ sau 2 giây.</p>
+<div class="container">
+    <h2>🎉 VƯỢT LINK THÀNH CÔNG!</h2>
+    <div class="notice">
+        <strong>Chúc mừng bạn!</strong> Bạn đã hoàn thành nhiệm vụ vượt link quảng cáo. Bấm nút bên dưới để cộng 6 Coin vào ví.
     </div>
+    
+    <button class="btn-claim" onclick="congCoin()">💰 NHẬN 6 COIN NGAY</button>
+</div>
 
-    <script>
-        window.onload = function() {
-            let currentCoin = parseInt(localStorage.getItem('guest_coin') || '0');
-            currentCoin += 6; // Cộng 6 coin
-            localStorage.setItem('guest_coin', currentCoin.toString());
+<script>
+    function congCoin() {
+        let currentCoin = parseInt(localStorage.getItem('user_coins')) || 0;
+        currentCoin += 6;
+        localStorage.setItem('user_coins', currentCoin);
+        alert("Đã cộng 6 Coin vào tài khoản của bạn!");
+        window.location.href = "index.html"; // Quay lại trang chủ đổi máy
+    }
+</script>
 
-            setTimeout(function() {
-                window.location.href = "index.html";
-            }, 2000);
-        }
-    </script>
 </body>
 </html>
