@@ -70,6 +70,77 @@
 </div>
 
 <script>
+    const SUPABASE_URL = "https://nigbaxusbacupefjkyud.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentCoin = parseInt(localStorage.getItem('user_coins')) || 0;
+    document.getElementById('coin-count').innerText = currentCoin;
+
+    function vuotLink() {
+        // LƯU Ý: Lấy link nhận coin bỏ vào web rút gọn link kiếm tiền, rồi dán link đã rút gọn vào đây!
+        // Tạm thời mình để link gốc của bạn để không bị lỗi trang:
+        window.location.href = "https://huy14072012.github.io/Ugphone/nhan-coin.html"; 
+    }
+
+    async function doiMay() {
+        if (currentCoin < 2) {
+            alert("Bạn không đủ số dư! Vui lòng bấm 'Vượt link' để kiếm thêm Coin nhé.");
+            return;
+        }
+
+        try {
+            // Lấy 1 máy trống
+            const { data: danhSachMay, error: loiLayMay } = await _supabase
+                .from('kho_may')
+                .select('*')
+                .eq('trang_thai', 'trong')
+                .limit(1);
+
+            if (loiLayMay || !danhSachMay || danhSachMay.length === 0) {
+                alert("Hệ thống đang bảo trì hoặc hiện tại đã hết sạch máy trống!");
+                return;
+            }
+
+            const mayChon = danhSachMay[0];
+
+            // Cập nhật trạng thái máy
+            const { error: loiCapNhat } = await _supabase
+                .from('kho_may')
+                .update({ 
+                    trang_thai: 'da_ban', 
+                    thoi_gian_ban: Date.now()
+                })
+                .eq('id', mayChon.id);
+
+            if (loiCapNhat) {
+                alert("Hệ thống bảo trì! Không thể cập nhật trạng thái máy trên database.");
+                return;
+            }
+
+            // Trừ coin
+            currentCoin -= 2;
+            localStorage.setItem('user_coins', currentCoin);
+            document.getElementById('coin-count').innerText = currentCoin;
+
+            const displayBox = document.getElementById('token-display');
+            displayBox.style.display = "block";
+            displayBox.innerHTML = `<strong>🎉 ĐỔI THÀNH CÔNG!</strong><br><br> MÃ MÁY CỦA BẠN LÀ:<br><code style="color: #00ff88;">${mayChon.token}</code>`;
+            
+            alert("Đổi máy thành công!");
+
+        } catch (catchedError) {
+            alert("Hệ thống gặp lỗi xử lý ngoài ý muốn!");
+        }
+    }
+</script>
+
+</body>
+</html>
+    <div id="token-display" class="token-box"></div>
+</div>
+
+<script>
     // 1. Cấu hình kết nối Supabase của bạn
     const SUPABASE_URL = "https://nigbaxusbacupefjkyud.supabase.co";
     const SUPABASE_KEY = "sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
