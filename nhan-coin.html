@@ -56,33 +56,30 @@
 </div>
 
 <script>
-    // Lấy ngày hôm nay (Ví dụ: "2026-05-21")
-    const homNay = new Date().toISOString().split('T')[0];
-    
-    // Kiểm tra xem người này hôm nay đã nhận coin lần nào chưa
-    const ngayDaNhan = localStorage.getItem('ngay_da_nhan_coin');
+    // Kiểm tra xem trong phiên truy cập này người dùng đã bấm nhận coin chưa
+    const daNhanTrongPhien = sessionStorage.getItem('da_nhan_coin_phien_nay');
 
-    // NẾU ĐÃ NHẬN RỒI -> KHÓA LUÔN TRANG, KHÔNG CHO BẤM NÚT
-    if (ngayDaNhan === homNay) {
+    // NẾU ĐÃ NHẬN RỒI -> KHÓA LUÔN, BẤM LẦN 2 SẼ BỊ CHẶN
+    if (daNhanTrongPhien === 'true') {
         document.getElementById('main-box').innerHTML = `
-            <h2 style="color: #ff4d4d;">❌ BẠN ĐÃ NHẬN COIN HÔM NAY!</h2>
-            <p style="font-size: 15px; margin-top: 15px; color: #aaa;">Mỗi ngày bạn chỉ được nhận coin 1 lần duy nhất từ hệ thống để tránh gian lận.</p>
-            <p style="color: #ffcc00; font-weight: bold;">Hãy quay lại vào ngày mai nhé!</p>
+            <h2 style="color: #ff4d4d;">❌ LƯỢT NHẬN ĐÃ HẾT HẠN!</h2>
+            <p style="font-size: 15px; margin-top: 15px; color: #aaa;">Mỗi lần vượt link bạn chỉ được bấm nút nhận coin đúng 1 lần duy nhất.</p>
+            <p style="color: #ffcc00; font-weight: bold;">Vui lòng quay lại trang chủ và thực hiện lượt vượt link mới!</p>
             <button class="btn-claim" style="background-color: #007bff; color: white; margin-top: 15px;" onclick="window.location.href='index.html'">Quay lại Trang Chủ</button>
         `;
     }
 
     function congCoin() {
-        // Đánh dấu vào bộ nhớ máy là "Hôm nay người này đã ăn coin rồi"
-        localStorage.setItem('ngay_da_nhan_coin', homNay);
+        // Đánh dấu ngay lập tức là đã nhận coin rồi
+        sessionStorage.setItem('da_nhan_coin_phien_nay', 'true');
 
-        // Tiến hành cộng coin như bình thường
+        // Cộng coin vào ví máy người dùng
         let currentCoin = parseInt(localStorage.getItem('user_coins')) || 0;
         currentCoin += 6;
         localStorage.setItem('user_coins', currentCoin);
         
         alert("Đã cộng 6 Coin vào tài khoản của bạn!");
-        window.location.href = "index.html"; // Chuyển ngay về trang chủ
+        window.location.href = "index.html"; 
     }
 </script>
 
