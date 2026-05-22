@@ -82,15 +82,17 @@
     const SUPABASE_KEY = "sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
     const LINK4M_URL = "https://link4m.net/ZG7hvw";
     const GIA_MAY_VIP = 500; 
+    const COIN_TOI_DA_MOI_NGAY = 500; // Giới hạn trần xu nhận được mỗi ngày
 
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     window.onload = function() {
+        // ĐÃ BỎ LỆNH RESET COIN VỀ 0 LÚC 00:00 ĐÊM
         const homNay = new Date().toDateString();
         const ngayHeThongGhiNhan = localStorage.getItem('ngay_he_thong');
 
+        // Sang ngày mới chỉ mở khóa lượt vượt link chứ giữ nguyên số coin cũ
         if (ngayHeThongGhiNhan !== homNay) {
-            localStorage.setItem('user_coin', 0); 
             localStorage.setItem('ngay_he_thong', homNay); 
             localStorage.removeItem('ngay_vuot_link'); 
         }
@@ -104,15 +106,25 @@
     };
 
     function batDauLamNhiemVu() {
+        let coinHienTai = parseInt(localStorage.getItem('user_coin') || 0);
         const homNay = new Date().toDateString(); 
         const ngayDaVuot = localStorage.getItem('ngay_vuot_link');
 
-        if (ngayDaVuot === homNay) {
-            alert("Hôm nay bạn đã vượt link rồi! Vui lòng quay lại sau 00:00 đêm để nhận tiếp.");
+        // Điều kiện 1: Nếu trong ví đã có từ 500 xu trở lên thì chặn không cho cày tiếp
+        if (coinHienTai >= COIN_TOI_DA_MOI_NGAY) {
+            alert(`Tài khoản của bạn đã đạt mức tối đa ${COIN_TOI_DA_MOI_NGAY} Coin của ngày hôm nay! Hãy bấm ĐỔI MÁY để sử dụng bớt xu trước nhé.`);
             return;
         }
 
+        // Điều kiện 2: Kiểm tra chặn theo ngày
+        if (ngayDaVuot === homNay) {
+            alert("Hôm nay bạn đã vượt link nhận coin rồi! Vui lòng quay lại sau 00:00 đêm để nhận tiếp.");
+            return;
+        }
+
+        // Mở khóa tạm thời để trang nhan-coin.html xử lý hợp lệ
         localStorage.removeItem('da_nhan_coin_roi');
+
         alert("Đang chuyển hướng đến Link4M...");
         window.location.href = LINK4M_URL;
     }
