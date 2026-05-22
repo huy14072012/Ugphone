@@ -228,22 +228,21 @@
         let currentCoin = parseInt(localStorage.getItem("my_test_coins")) || 168;
         document.getElementById("userCoin").innerText = currentCoin;
 
+        // Hàm xử lý vượt link giới hạn 1 lần/ngày và đá sang Link4M
         function nhanCoinLuon() {
             let homNay = new Date().toDateString(); 
             let ngayDaVuotLink = localStorage.getItem("ngay_da_vuot_link");
 
             if (ngayDaVuotLink === homNay) {
-                alert("Hôm nay bạn đã vượt link rồi! Mỗi ngày chỉ được vượt link 1 lần.");
+                alert("Hôm nay bạn đã vượt link rồi! Mỗi ngày chỉ được vượt link 1 lần. Hãy quay lại vào ngày mai!");
                 return;
             }
 
-            currentCoin += 6;
-            localStorage.setItem("my_test_coins", currentCoin);
-            localStorage.setItem("ngay_da_vuot_link", homNay); 
-            document.getElementById("userCoin").innerText = currentCoin;
-            alert("Vượt link thành công! Bạn được cộng thêm 6 Coin.");
+            // Chuyển hướng người dùng sang Link4M của bạn
+            window.location.href = "https://link4m.org/6lntv"; 
         }
 
+        // Hàm xử lý đổi máy kết nối Supabase bốc máy và đổi trạng thái
         async function batDauDoiMay() {
             if (currentCoin < 2) {
                 alert("Bạn không đủ Coin!");
@@ -282,12 +281,12 @@
                 return;
             }
 
-            // 3. Trừ coin và lưu dữ liệu mới vào ví
+            // 3. Trừ coin và lưu dữ liệu mới vào ví người dùng
             currentCoin -= 2;
             localStorage.setItem("my_test_coins", currentCoin);
             document.getElementById("userCoin").innerText = currentCoin;
 
-            // 4. Show token ra màn hình
+            // 4. Show token ra màn hình bọc chữ chống lồi
             document.getElementById("jsonTokenArea").innerText = mayDuocChon.token; 
             document.getElementById("successBox").style.display = "block";
         }
