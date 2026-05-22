@@ -43,10 +43,20 @@
             margin-top: 10px;
             transition: 0.3s;
         }
-        .btn-link { background: #00e676; }
-        .btn-link:hover { background: #00b359; box-shadow: 0 0 10px rgba(0,230,118,0.5); }
-        .btn-buy { background: #ffcc00; }
-        .btn-buy:hover { background: #e6b800; box-shadow: 0 0 10px rgba(255,204,0,0.5); }
+        .btn-link {
+            background: #00e676;
+        }
+        .btn-link:hover { 
+            background: #00b359; 
+            box-shadow: 0 0 10px rgba(0,230,118,0.5); 
+        }
+        .btn-buy {
+            background: #ffcc00;
+        }
+        .btn-buy:hover { 
+            background: #e6b800; 
+            box-shadow: 0 0 10px rgba(255,204,0,0.5); 
+        }
         .output-box {
             margin-top: 20px;
             background: #000;
@@ -71,6 +81,7 @@
     <div class="wallet">💰 Số dư của bạn: <span id="so-coin">0</span> Coin</div>
 
     <button class="btn btn-link" onclick="batDauLamNhiemVu()">VƯỢT LINK4M ĐỂ NHẬN COMBO 3 MÁY</button>
+    
     <button class="btn btn-buy" onclick="muaMayVipTuDong()">MUA MÁY</button>
 
     <div class="output-box" id="o-hien-thi-code">Mã Token F12 của 3 máy UgPhone sẽ xuất hiện ở đây sau khi bạn mua máy thành công...</div>
@@ -101,6 +112,9 @@
             alert("Mỗi ngày bạn chỉ được vượt link nhận coin free 1 lần thôi! Nếu đã có đủ Coin, hãy bấm MUA MÁY nhé.");
             return;
         }
+
+        // CHỖ SỬA QUAN TRỌNG: Xóa bỏ trạng thái đã nhận coin cũ để trang nhan-coin.html cho phép nhận lượt mới
+        localStorage.removeItem('da_nhan_coin_roi');
 
         alert("Đang chuyển hướng bạn đến nhiệm vụ Link4M để tích luỹ 500 Coin...");
         window.location.href = LINK4M_URL;
