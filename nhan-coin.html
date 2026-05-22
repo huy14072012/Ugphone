@@ -8,21 +8,22 @@
         body {
             background-color: #121212;
             color: #ffffff;
-            font-family: sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             text-align: center;
             padding-top: 100px;
         }
         .loading-box {
-            max-width: 400px;
+            max-width: 450px;
             margin: 0 auto;
             background: #1e1e1e;
             padding: 30px;
             border-radius: 15px;
             border: 1px solid #ffcc00;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.2);
         }
-        h2 { color: #ffcc00; }
+        h2 { color: #ffcc00; margin-bottom: 10px; }
         .loader {
-            border: 4px solid #f3f3f3;
+            border: 4px solid #333;
             border-top: 4px solid #ffcc00;
             border-radius: 50%;
             width: 40px;
@@ -34,33 +35,59 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .error-text {
+            color: #ff3333 !important;
+        }
     </style>
 </head>
 <body>
 
-<div class="loading-box">
-    <h2>🎉 VƯỢT LINK THÀNH CÔNG!</h2>
-    <div class="loader"></div>
-    <p id="thong-bao">Hệ thống đang cộng 500 Coin vào tài khoản của bạn...</p>
+<div class="loading-box" id="hop-thong-bao">
+    <h2 id="tieu-de">🎉 VƯỢT LINK THÀNH CÔNG!</h2>
+    <div class="loader" id="vong-xoay"></div>
+    <p id="noi-dung">Hệ thống đang kiểm tra và cộng 500 Coin vào tài khoản của bạn...</p>
 </div>
 
 <script>
     window.onload = function() {
-        // 1. Cộng thẳng 500 Coin vào bộ nhớ máy của khách
+        // 1. KIỂM TRA XEM KHÁCH ĐÃ TỪNG NHẬN COIN LƯỢT NÀY CHƯA
+        let daNhanLượtNay = localStorage.getItem('da_nhan_coin_roi');
+
+        if (daNhanLượtNay === "true") {
+            // Nếu đã nhận rồi mà cố tình quay lại -> Đổi giao diện thành báo lỗi nghiêm trọng
+            document.getElementById('tieu-de').innerText = "❌ CẢNH BÁO SPAM!";
+            document.getElementById('tieu-de').className = "error-text";
+            document.getElementById('vong-xoay').style.display = "none"; // Ẩn vòng xoay loading
+            document.getElementById('noi-dung').innerText = "Bạn đã nhận phần thưởng cho lượt vượt link này rồi! Không được gian lận. Đang chuyển hướng bạn về trang chủ...";
+            document.getElementById('noi-dung').className = "error-text";
+
+            // Đợi 3 giây rồi đẩy bay màu về trang chủ index.html
+            setTimeout(function() {
+                window.location.href = "index.html";
+            }, 3000);
+            
+            return; // Dừng toàn bộ code phía dưới lại, không cho cộng tiền
+        }
+
+        // 2. NẾU HỢP LỆ (CHƯA NHẬN LẦN NÀO): TIẾN HÀNH CỘNG COIN
         let coinHienTai = parseInt(localStorage.getItem('user_coin') || 0);
-        let coinMoi = coinHienTai + 500; // Cộng 500 coin để đủ tiền mua combo
+        let coinMoi = coinHienTai + 500; 
         localStorage.setItem('user_coin', coinMoi);
 
-        // 2. Đánh dấu hôm nay thiết bị này đã nhận coin để chặn vượt tiếp
+        // 3. ĐÁNH DẤU KHÓA CHẾ ĐỘ: ĐÃ NHẬN NGAY LẬP TỨC
+        localStorage.setItem('da_nhan_coin_roi', "true");
+
+        // Đánh dấu ngày chặn ở trang chủ
         const homNay = new Date().toDateString();
         localStorage.setItem('ngay_vuot_link', homNay);
 
-        document.getElementById('thong-bao').innerText = "Đã cộng thành công 500 Coin! Đang đưa bạn quay lại trang chủ để MUA MÁY...";
+        // Hiển thị thông báo thành công cho khách vui
+        document.getElementById('noi-dung').innerText = "Đã cộng thành công 500 Coin vào ví! Đang đưa bạn quay lại trang chủ để thực hiện MUA MÁY...";
 
-        // 3. Đợi 2 giây cho khách kịp nhìn rồi tự động tự đá về trang chủ index.html
+        // Đợi 2.5 giây rồi tự động đá về trang chủ để mua máy
         setTimeout(function() {
-            window.location.href = "index.html"; 
-        }, 2000);
+            window.location.href = "index.html";
+        }, 2500);
     };
 </script>
 
