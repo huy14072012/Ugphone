@@ -250,29 +250,45 @@
                 return;
             }
 
-            // Gọi đích danh cột trang_thai bằng chữ 'trong' để Supabase chấp nhận gói tin
-            let { data: khoMay, error } = await _supabase
+            // 1. Tìm 1 con máy đang có trạng thái là 'trong'
+            let { data: khoMay, error: fetchError } = await _supabase
                 .from('kho_may') 
-                .select('token, trang_thai')
+                .select('id, token, trang_thai')
                 .eq('trang_thai', 'trong')
                 .limit(1);
 
-            if (error) {
+            if (fetchError) {
                 alert("Lỗi kết nối dữ liệu kho máy!");
-                console.log(error);
+                console.log(fetchError);
                 return;
             }
 
             if (!khoMay || khoMay.length === 0) {
-                alert("Hết máy trong kho rồi!");
+                alert("Hết máy trong kho rồi bạn ơi!");
                 return;
             }
 
+            let mayDuocChon = khoMay[0];
+
+            // 2. CẬP NHẬT TRẠNG THÁI: Đổi máy này thành 'da_ban' lập tức trên Supabase
+            let { error: updateError } = await _supabase
+                .from('kho_may')
+                .update({ trang_thai: 'da_ban' })
+                .eq('id', mayDuocChon.id);
+
+            if (updateError) {
+                alert("Lỗi khi cập nhật trạng thái máy! Vui lòng bấm lại.");
+                console.log(updateError);
+                return;
+            }
+
+            // 3. Trừ coin và lưu dữ liệu mới vào ví
             currentCoin -= 2;
             localStorage.setItem("my_test_coins", currentCoin);
             document.getElementById("userCoin").innerText = currentCoin;
 
-            document.getElementById("jsonTokenArea").innerText = khoMay[0].token; 
+            // 4. Show token ra màn hình
+            document.getElementById("jsonTokenArea").innerText = mayDuocChon.token; 
             document.getElementById("successBox").style.display = "block";
         }
 
