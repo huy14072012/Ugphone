@@ -3,301 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Đổi Máy UgPhone</title>
+    <title>Anya Blox Trái Cây - Đổi Máy UgPhone Tự Động</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
         body {
             background-color: #121212;
             color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
             padding: 20px;
         }
-
-        .main-card {
-            background-color: #1a1a1a;
-            width: 100%;
-            max-width: 360px;
-            border-radius: 20px;
-            padding: 25px 20px;
-            text-align: center;
-            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.5);
-            border: 1px solid #2a2a2a;
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 230, 118, 0.2);
+            border: 1px solid #00e676;
         }
-
-        .main-title {
-            color: #00e676;
-            font-size: 22px;
-            font-weight: bold;
-            text-transform: uppercase;
-            line-height: 1.3;
-            letter-spacing: 0.5px;
-            margin-bottom: 5px;
-        }
-
-        .sub-title {
-            color: #ffcc00; 
-            font-size: 20px;
-            font-weight: bold;
-            background-color: #262626;
-            padding: 14px;
-            border-radius: 10px;
-            margin: 20px 0;
-            width: 100%;
-            display: block;
-            border: 1px solid #333;
-        }
-
-        .btn-custom {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%; 
-            padding: 14px 16px;
-            margin: 12px 0;
-            border: none;
+        h1 { color: #00e676; font-size: 24px; }
+        .wallet {
+            font-size: 18px;
+            margin: 15px 0;
+            background: #2a2a2a;
+            padding: 10px;
             border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            text-decoration: none;
-            cursor: pointer;
-            color: #ffffff;
-            text-transform: uppercase;
-            transition: all 0.2s ease;
+            border-left: 5px solid #ffcc00;
         }
-
-        .btn-custom:active {
-            transform: scale(0.98);
-        }
-
-        .btn-blue { background-color: #007bff; }
-        .btn-green { background-color: #28a745; }
-        .btn-purple { background-color: #6f42c1; }
-
-        .success-box {
-            border: 2px dashed #00e676;
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 20px;
-            width: 100%;
-            background-color: rgba(0, 230, 118, 0.05);
-        }
-
-        .success-title {
-            color: #00e676;
-            font-weight: bold;
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-
-        .info-text {
-            color: #cccccc;
-            font-size: 12px;
-            margin-bottom: 12px;
-        }
-
-        .account-table {
-            width: 100%;
-            margin: 10px 0;
-            border-collapse: collapse;
-            background-color: #222222;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        .account-table td {
-            padding: 10px;
-            font-size: 12px;
-            text-align: left;
-            border-bottom: 1px solid #333333;
-            color: #ffffff;
-        }
-
-        .code-display-box {
-            width: 100%;
-            min-height: 50px;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #444;
-            background-color: #121212;
-            color: #00e676;
-            font-family: monospace;
-            font-size: 11px;
-            text-align: left;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            word-break: break-all;
-            overflow: hidden;
-        }
-
-        .btn-copy {
-            width: 100%;
-            margin-top: 6px;
-            padding: 8px;
-            background-color: #ffcc00;
-            color: #000000;
-            font-weight: bold;
+        .btn {
+            background: #00e676;
+            color: #000;
             border: none;
-            border-radius: 4px;
-            font-size: 11px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
             cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: 0.3s;
         }
-
-        .menu-links {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-            border-top: 1px solid #2a2a2a;
-            padding-top: 15px;
-        }
-
-        .menu-links a {
-            color: #aaa;
-            font-size: 12px;
-            text-decoration: none;
-        }
-
-        .menu-links a:hover {
+        .btn:hover { background: #00b359; box-shadow: 0 0 10px rgba(0,230,118,0.5); }
+        .output-box {
+            margin-top: 20px;
+            background: #000;
             color: #00e676;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 50px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            text-align: left;
+            font-size: 12px;
+            border: 1px dashed #00e676;
         }
     </style>
 </head>
 <body>
 
-    <div class="main-card">
-        <h1 class="main-title"><i class="fa-solid fa-mobile-screen-button"></i> HỆ THỐNG ĐỔI MÁY</h1>
-        <h1 class="main-title">UGPHONE</h1>
+<div class="container">
+    <h1>Anya Blox Trái Cây 🍎</h1>
+    <p>Hệ thống tự động phát Combo 3 máy UgPhone treo game</p>
+    
+    <div class="wallet">💰 Số dư của bạn: <span id="so-coin">0</span> Coin</div>
 
-        <div class="sub-title"><i class="fa-solid fa-wallet"></i> Ví của bạn: <span id="userCoin">168</span> COIN</div>
+    <button class="btn" onclick="batDauLamNhiemVu()">🔗 VƯỢT LINK4M ĐỂ NHẬN COMBO 3 MÁY</button>
 
-        <button class="btn-custom btn-blue" onclick="nhanCoinLuon()">
-            <i class="fa-solid fa-link"></i> VƯỢT LINK NHẬN COIN (+6 COIN)
-        </button>
+    <div class="output-box" id="o-hien-thi-code">Mã Token F12 của 3 máy UgPhone sẽ xuất hiện ở đây sau khi bạn vượt link thành công...</div>
+</div>
 
-        <button class="btn-custom btn-green" onclick="batDauDoiMay()">
-            <i class="fa-solid fa-gift"></i> ĐỔI MÁY NGAY (Tốn 2 Coin)
-        </button>
+<script>
+    // ==========================================
+    // ⚙️ ĐÃ CẤU HÌNH ĐÚNG THÔNG TIN DATA CỦA BẠN
+    // ==========================================
+    const SUPABASE_URL = "https://nigbaxusbacupefjkyud.supabase.co"; 
+    const SUPABASE_KEY = "sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
+    const LINK4M_URL = "https://link4m.org/6lntv";
 
-        <a href="https://clientclone.ayabloxtraicay.site/autobuyugphone.php" target="_blank" class="btn-custom btn-purple">
-            <i class="fa-solid fa-robot"></i> auto buy máy ugphone
-        </a>
+    // Khởi tạo kết nối Supabase
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        <div id="successBox" class="success-box" style="display: none;">
-            <p class="success-title"><i class="fa-solid fa-circle-check"></i> ĐỔI MÁY THÀNH CÔNG!</p>
-            <p class="info-text">Đã trừ 2 Coin trong ví của bạn.</p>
+    // Tự động chạy khi tải xong trang web
+    window.onload = function() {
+        hienThiCoinThucTe();
+        kiemTraKetQuaSauKhiVuot();
+    };
 
-            <table class="account-table">
-                <tbody>
-                    <tr>
-                        <td style="width: 35%; font-weight: bold; color: #aaa;"><i class="fa-solid fa-clock"></i> Hạn máy:</td>
-                        <td style="color: #00e676; font-weight: bold;">Mới tinh (4 Giờ)</td>
-                    </tr>
-                    <tr>
-                        <td style="font-weight: bold; color: #aaa; vertical-align: top; padding-top: 12px;"><i class="fa-solid fa-key"></i> Mã Code:</td>
-                        <td>
-                            <div id="jsonTokenArea" class="code-display-box"></div>
-                            <button class="btn-copy" onclick="copyUgPhoneToken()"><i class="fa-solid fa-copy"></i> Sao chép mã</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    // Hàm lấy coin thực tế trên thiết bị của khách
+    function hienThiCoinThucTe() {
+        let coinHienTai = localStorage.getItem('user_coin');
+        if (coinHienTai === null) {
+            coinHienTai = 0;
+            localStorage.setItem('user_coin', 0);
+        }
+        document.getElementById('so-coin').innerText = coinHienTai;
+    }
 
-        <div class="menu-links">
-            <a href="nhan-coin.html"><i class="fa-solid fa-coins"></i> Lịch sử nhận xu</a>
-            <a href="giu-tai-khoan.html"><i class="fa-solid fa-user-shield"></i> Giữ tài khoản</a>
-        </div>
-    </div>
+    // Hàm khi khách bấm nút Vượt Link
+    function batDauLamNhiemVu() {
+        const homNay = new Date().toDateString(); 
+        const ngayDaVuot = localStorage.getItem('ngay_vuot_link');
 
-    <script>
-        const SUPABASE_URL = "https://nigbaxusbacupefjkyud.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        let currentCoin = parseInt(localStorage.getItem("my_test_coins")) || 168;
-        document.getElementById("userCoin").innerText = currentCoin;
-
-        // Hàm xử lý vượt link giới hạn 1 lần/ngày và đá sang Link4M
-        function nhanCoinLuon() {
-            let homNay = new Date().toDateString(); 
-            let ngayDaVuotLink = localStorage.getItem("ngay_da_vuot_link");
-
-            if (ngayDaVuotLink === homNay) {
-                alert("Hôm nay bạn đã vượt link rồi! Mỗi ngày chỉ được vượt link 1 lần. Hãy quay lại vào ngày mai!");
-                return;
-            }
-
-            // Chuyển hướng người dùng sang Link4M của bạn
-            window.location.href = "https://link4m.org/6lntv"; 
+        // Khóa chống spam 1 lượt/ngày
+        if (ngayDaVuot === homNay) {
+            alert("Bạn ơi! Mỗi ngày bạn chỉ được nhận Combo 3 máy 1 lần thôi. Hãy nhường suất cho người khác và quay lại vào ngày mai nhé!");
+            return;
         }
 
-        // Hàm xử lý đổi máy kết nối Supabase bốc máy và đổi trạng thái
-        async function batDauDoiMay() {
-            if (currentCoin < 2) {
-                alert("Bạn không đủ Coin!");
-                return;
-            }
+        alert("Đang chuyển hướng bạn đến nhiệm vụ Link4M để lấy mã...");
+        window.location.href = LINK4M_URL;
+    }
 
-            // 1. Tìm 1 con máy đang có trạng thái là 'trong'
-            let { data: khoMay, error: fetchError } = await _supabase
-                .from('kho_may') 
-                .select('id, token, trang_thai')
-                .eq('trang_thai', 'trong')
-                .limit(1);
+    // Hàm tự động kiểm tra và phát code máy khi khách quay lại web
+    async function kiemTraKetQuaSauKhiVuot() {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Nhận diện khi khách đã vượt link thành công và quay lại web
+        if (urlParams.get('status') === 'success' || window.location.search.includes('status=success')) {
+            
+            document.getElementById('o-hien-thi-code').innerText = "🔄 Đang bốc 3 máy từ kho Supabase, vui lòng chờ trong giây lát...";
 
-            if (fetchError) {
-                alert("Lỗi kết nối dữ liệu kho máy!");
-                console.log(fetchError);
-                return;
-            }
-
-            if (!khoMay || khoMay.length === 0) {
-                alert("Hết máy trong kho rồi bạn ơi!");
-                return;
-            }
-
-            let mayDuocChon = khoMay[0];
-
-            // 2. CẬP NHẬT TRẠNG THÁI: Đổi máy này thành 'da_ban' lập tức trên Supabase
-            let { error: updateError } = await _supabase
+            // 1. Lấy cùng lúc 3 con máy có trạng thái trống từ bảng kho_may
+            const { data: danhSachMay, error } = await _supabase
                 .from('kho_may')
-                .update({ trang_thai: 'da_ban' })
-                .eq('id', mayDuocChon.id);
+                .select('*')
+                .eq('trang_thai', 'trong')
+                .limit(3);
 
-            if (updateError) {
-                alert("Lỗi khi cập nhật trạng thái máy! Vui lòng bấm lại.");
-                console.log(updateError);
+            if (error || !danhSachMay || danhSachMay.length < 3) {
+                document.getElementById('o-hien-thi-code').innerText = "❌ HẾT MÁY! Kho máy hiện tại không đủ 3 con, vui lòng báo Admin nạp thêm!";
                 return;
             }
 
-            // 3. Trừ coin và lưu dữ liệu mới vào ví người dùng
-            currentCoin -= 2;
-            localStorage.setItem("my_test_coins", currentCoin);
-            document.getElementById("userCoin").innerText = currentCoin;
+            // 2. Tạo chuỗi hiển thị mã token
+            let chuoiKetQua = "🎉 VƯỢT LINK THÀNH CÔNG! ĐÂY LÀ 3 MÁY CỦA BẠN:\n\n";
+            let danhSachId = [];
 
-            // 4. Show token ra màn hình bọc chữ chống lồi
-            document.getElementById("jsonTokenArea").innerText = mayDuocChon.token; 
-            document.getElementById("successBox").style.display = "block";
-        }
-
-        function copyUgPhoneToken() {
-            let copyText = document.getElementById("jsonTokenArea").innerText;
-            if (copyText === "") return;
-            navigator.clipboard.writeText(copyText).then(() => {
-                alert("Đã sao chép mã thành công!");
+            danhSachMay.forEach((may, index) => {
+                chuoiKetQua += `📱 MÁY SỐ ${index + 1}:\n${may.token}\n-----------------------\n`;
+                danhSachId.push(may.id);
             });
+
+            // Đưa mã code lên giao diện khung đen cho khách
+            document.getElementById('o-hien-thi-code').innerText = chuoiKetQua;
+
+            // 3. Đánh dấu 'da_ban' lên database để tránh trùng lặp máy cho người sau
+            for (let id of danhSachId) {
+                await _supabase
+                    .from('kho_may')
+                    .update({ trang_thai: 'da_ban' })
+                    .eq('id', id);
+            }
+
+            // 4. Cộng coin cho khách tăng độ uy tín (Cộng 100 coin)
+            let coinMoi = parseInt(localStorage.getItem('user_coin') || 0) + 100;
+            localStorage.setItem('user_coin', coinMoi);
+            document.getElementById('so-coin').innerText = coinMoi;
+
+            // 5. Khóa thiết bị hôm nay không cho bấm tiếp
+            const homNay = new Date().toDateString();
+            localStorage.setItem('ngay_vuot_link', homNay);
+            
+            alert("Chúc mừng bạn đã nhận thành công Combo 3 máy UgPhone!");
         }
-    </script>
+    }
+</script>
+
 </body>
 </html>
