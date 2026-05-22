@@ -217,7 +217,7 @@
             let { data: khoMay, error } = await _supabase
                 .from('kho_may') 
                 .select('*')
-                .eq('status', 'trong') 
+                .or('status.eq.trong,status.eq.Trong,status.eq.TRONG')
                 .limit(1);
 
             if (error || !khoMay || khoMay.length === 0) {
