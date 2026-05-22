@@ -217,7 +217,7 @@
             let { data: khoMay, error } = await _supabase
                 .from('kho_may') 
                 .select('*')
-                .or('status.eq.trong,status.eq.Trong,status.eq.TRONG')
+                .or('trang_thai.eq.trong,trang_thai.eq.Trong,trang_thai.eq.TRONG')
                 .limit(1);
 
             if (error || !khoMay || khoMay.length === 0) {
@@ -229,7 +229,7 @@
             localStorage.setItem("my_test_coins", currentCoin);
             document.getElementById("userCoin").innerText = currentCoin;
 
-            let chuoiMaSach = khoMay[0].ma_token || khoMay[0].token || khoMay[0].id_may || JSON.stringify(khoMay[0]);
+            let chuoiMaSach = khoMay[0].token || JSON.stringify(khoMay[0]);
             
             document.getElementById("jsonTokenArea").innerText = chuoiMaSach; 
             document.getElementById("successBox").style.display = "block";
