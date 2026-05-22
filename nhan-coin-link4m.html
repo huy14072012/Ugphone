@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đang xử lý nhận Coin...</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #121212; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .main-card { background-color: #1a1a1a; width: 100%; max-width: 360px; border-radius: 20px; padding: 30px 20px; text-align: center; border: 1px solid #2a2a2a; box-shadow: 0px 10px 25px rgba(0,0,0,0.5); }
+        .icon-box { font-size: 50px; color: #00e676; margin-bottom: 15px; }
+        .icon-error { color: #ff3333; }
+        .title { font-size: 20px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; }
+        .title-success { color: #00e676; }
+        .title-error { color: #ff3333; }
+        .msg { color: #ccc; font-size: 14px; line-height: 1.5; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="main-card">
+        <div id="loadingIcon" class="icon-box"><i class="fa-solid fa-spinner fa-spin" style="color: #ffcc00;"></i></div>
+        <div id="statusTitle" class="title" style="color: #ffcc00;">Đang kiểm tra...</div>
+        <div id="statusMsg" class="msg">Hệ thống đang xác thực lượt vượt link của bạn...</div>
+    </div>
+
+    <script>
+        setTimeout(() => {
+            let loadingIcon = document.getElementById("loadingIcon");
+            let statusTitle = document.getElementById("statusTitle");
+            let statusMsg = document.getElementById("statusMsg");
+
+            // 1. Lấy thông số token bảo mật từ URL và bộ nhớ kiểm tra hack
+            let urlParams = new URLSearchParams(window.location.search);
+            let urlToken = urlParams.get('token');
+            
+            let homNay = new Date().toDateString();
+            let ngayDaVuotLink = localStorage.getItem("ngay_da_vuot_link");
+            let linkNayDaDung = localStorage.getItem("link_4m_da_su_dung");
+
+            // 2. CHẶN HACK: Nếu trang đã được dùng rồi hoặc hôm nay đã nhận rồi thì khóa luôn
+            if (linkNayDaDung === "true" || ngayDaVuotLink === homNay || urlToken !== "hop_le_2026") {
+                loadingIcon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+                loadingIcon.className = "icon-box icon-error";
+                statusTitle.innerText = "LỖI TRUY CẬP!";
+                statusTitle.className = "title title-error";
+                statusMsg.innerHTML = "Trang nhận xu này đã hết hạn hoặc bạn đã nhận quà hôm nay rồi!<br>Hệ thống đang đưa bạn về trang chủ...";
+                
+                setTimeout(() => { window.location.href = "index.html"; }, 3000);
+                return;
+            }
+
+            // 3. HỢP LỆ: Tiến hành cộng 6 Coin và khóa trang này vĩnh viễn
+            let currentCoin = parseInt(localStorage.getItem("my_test_coins")) || 168;
+            currentCoin += 6;
+            
+            localStorage.setItem("my_test_coins", currentCoin);
+            localStorage.setItem("ngay_da_vuot_link", homNay);
+            localStorage.setItem("link_4m_da_su_dung", "true"); // KHÓA TRANG NÀY LẠI NGAY
+
+            // 4. Hiển thị thông báo thành công cho người dùng
+            loadingIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+            loadingIcon.style.color = "#00e676";
+            statusTitle.innerText = "THÀNH CÔNG!";
+            statusTitle.className = "title title-success";
+            statusMsg.innerHTML = "Bạn được cộng thành công <span style='color: #ffcc00; font-weight: bold;'>+6 COIN</span> vào ví!<br>Đang quay lại trang chủ...";
+
+            setTimeout(() => {
+                // Xóa trạng thái khóa link tạm thời khi về trang chủ để ngày mai họ tạo lượt mới
+                localStorage.removeItem("link_4m_da_su_dung");
+                window.location.href = "index.html";
+            }, 3000);
+
+        }, 1500); // Tạo hiệu ứng load mượt mà cho giống hệ thống lớn
+    </script>
+</body>
+</html>
