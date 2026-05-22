@@ -222,7 +222,7 @@
 
     <script>
         const SUPABASE_URL = "https://nigbaxusbacupefjkyud.supabase.co";
-        const SUPABASE_KEY = "Sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
+        const SUPABASE_KEY = "sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentCoin = parseInt(localStorage.getItem("my_test_coins")) || 168;
@@ -233,7 +233,7 @@
             let ngayDaVuotLink = localStorage.getItem("ngay_da_vuot_link");
 
             if (ngayDaVuotLink === homNay) {
-                alert("Hôm nay bạn đã vượt link rồi! Mỗi ngày chỉ được vượt link 1 lần. Quay lại vào ngày mai nhé!");
+                alert("Hôm nay bạn đã vượt link rồi! Mỗi ngày chỉ được vượt link 1 lần.");
                 return;
             }
 
@@ -250,24 +250,20 @@
                 return;
             }
 
+            // Gọi đích danh cột trang_thai bằng chữ 'trong' để Supabase chấp nhận gói tin
             let { data: khoMay, error } = await _supabase
                 .from('kho_may') 
-                .select('*');
+                .select('token, trang_thai')
+                .eq('trang_thai', 'trong')
+                .limit(1);
 
             if (error) {
                 alert("Lỗi kết nối dữ liệu kho máy!");
+                console.log(error);
                 return;
             }
 
-            let mayTrong = khoMay.find(item => {
-                if (item.trang_thai) {
-                    let checkText = item.trang_thai.toString().trim().toLowerCase();
-                    return checkText === 'trong';
-                }
-                return false;
-            });
-
-            if (!mayTrong) {
+            if (!khoMay || khoMay.length === 0) {
                 alert("Hết máy trong kho rồi!");
                 return;
             }
@@ -276,9 +272,7 @@
             localStorage.setItem("my_test_coins", currentCoin);
             document.getElementById("userCoin").innerText = currentCoin;
 
-            let chuoiMaSach = mayTrong.token || JSON.stringify(mayTrong);
-            
-            document.getElementById("jsonTokenArea").innerText = chuoiMaSach; 
+            document.getElementById("jsonTokenArea").innerText = khoMay[0].token; 
             document.getElementById("successBox").style.display = "block";
         }
 
