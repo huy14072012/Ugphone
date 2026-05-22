@@ -23,11 +23,10 @@
             padding: 20px;
         }
 
-        /* KHỐI HỘP ĐEN GỐC CHUẨN TỶ LỆ ĐẸP NHẤT */
         .main-card {
             background-color: #1a1a1a;
             width: 100%;
-            max-width: 360px; /* Khung chuẩn màn hình điện thoại */
+            max-width: 360px;
             border-radius: 20px;
             padding: 25px 20px;
             text-align: center;
@@ -35,7 +34,7 @@
         }
 
         .main-title {
-            color: #00e676; /* Màu xanh lá cây của bản gốc */
+            color: #00e676;
             font-size: 22px;
             font-weight: bold;
             text-transform: uppercase;
@@ -43,7 +42,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* Ô VÍ XU VÀNG CÂN ĐỐI CHÍNH GIỮA - KHÔNG BỊ BÓP MÉO */
         .sub-title {
             color: #ffcc00; 
             font-size: 20px;
@@ -52,11 +50,10 @@
             padding: 14px;
             border-radius: 10px;
             margin: 20px 0;
-            width: 100%; /* Giữ chiều rộng 100% không lệch */
+            width: 100%;
             display: block;
         }
 
-        /* NÚT BẤM ĐỒNG BỘ TỶ LỆ VỚI VÍ */
         .btn-custom {
             display: flex;
             align-items: center;
@@ -77,7 +74,6 @@
         .btn-blue { background-color: #007bff; }
         .btn-green { background-color: #28a745; }
 
-        /* KHUNG NÉT ĐỨT THÔNG BÁO THÀNH CÔNG */
         .success-box {
             border: 2px dashed #00e676;
             border-radius: 12px;
@@ -117,21 +113,21 @@
             color: #ffffff;
         }
 
-        /* Ô CHỨA MÃ CHỐNG TRÀN CHỮ TUYỆT ĐỐI */
-        .json-textarea {
+        .code-display-box {
             width: 100%;
-            height: 80px;
-            padding: 8px;
+            min-height: 50px;
+            padding: 10px;
             border-radius: 4px;
             border: 1px solid #444;
             background-color: #121212;
             color: #00e676;
             font-family: monospace;
             font-size: 11px;
-            resize: none;
-            outline: none;
-            white-space: pre-wrap; /* Tự động xuống dòng khi text dài */
-            word-wrap: break-word; /* Bẻ chữ chống đâm toạc khung */
+            text-align: left;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow: hidden;
         }
 
         .btn-copy {
@@ -184,7 +180,7 @@
                     <tr>
                         <td style="font-weight: bold; color: #aaa; vertical-align: top; padding-top: 12px;">Mã Code:</td>
                         <td>
-                            <textarea id="jsonTokenArea" class="json-textarea" readonly placeholder="Đang bốc mã từ kho..."></textarea>
+                            <div id="jsonTokenArea" class="code-display-box"></div>
                             <button class="btn-copy" onclick="copyUgPhoneToken()">📋 Sao chép mã</button>
                         </td>
                     </tr>
@@ -198,16 +194,13 @@
     </div>
 
     <script>
-        // --- KẾT NỐI ĐẾN ĐÚNG DATABASE THẬT CỦA BẠN ---
         const SUPABASE_URL = "https://nigbaxusbacupefjkyud.supabase.co";
         const SUPABASE_KEY = "Sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Khởi tạo và đọc số xu từ bộ nhớ LocalStorage của máy
         let currentCoin = parseInt(localStorage.getItem("my_test_coins")) || 168;
         document.getElementById("userCoin").innerText = currentCoin;
 
-        // Hàm click nút xanh dương tự nổ xu luôn không cần đi vượt link thật
         function nhanCoinLuon() {
             currentCoin += 6;
             localStorage.setItem("my_test_coins", currentCoin);
@@ -215,460 +208,37 @@
             alert("Đã cộng thêm 6 Coin vào ví thành công!");
         }
 
-        // Hàm xử lý đổi máy kết nối kho_may
         async function batDauDoiMay() {
             if (currentCoin < 2) {
                 alert("Bạn không đủ Coin!");
                 return;
             }
 
-            // Gọi lệnh lên Supabase bốc duy nhất 1 máy có trạng thái trống/chưa dùng
-            // Code tự tìm theo cả cột 'status' hoặc các cột khác nếu có dữ liệu trống
             let { data: khoMay, error } = await _supabase
                 .from('kho_may') 
                 .select('*')
-                .or('status.eq.trong,status.eq.chua_dung,status.is.null') // Lọc thông minh hàng trống hoặc chưa dùng
-                .limit(1);
-
-            // Nếu không tìm ra dòng nào hợp lệ hoặc kho trống
-            if (error || !khoMay || khoMay.length === 0) {
-                alert("Hết máy trống trong bảng 'kho_may' rồi! Bạn hãy vào Supabase nạp thêm mã vào cột nha.");
-                return;
-            }
-
-            // Trừ xu khi bốc máy thành công
-            currentCoin -= 2;
-            localStorage.setItem("my_test_coins", currentCoin);
-            document.getElementById("userCoin").innerText = currentCoin;
-
-            // FIX LỖI LẶP VÀ TRÀN CHỮ: Chỉ lấy đúng giá trị văn bản của cột chứa mã token
-            // Tự động kiểm tra cột tên là 'ma_token', 'token' hoặc 'id_may' trong bảng thật của bạn
-            let chuoiMaSạch = khoMay[0].ma_token || khoMay[0].token || khoMay[0].id_may || JSON.stringify(khoMay[0]);
-            
-            document.getElementById("jsonTokenArea").value = chuoiMaSạch; 
-            
-            // Hiện khung thông báo nét đứt lên
-            document.getElementById("successBox").style.display = "block";
-        }
-
-        // Hàm sao chép nhanh mã
-        function copyUgPhoneToken() {
-            let copyText = document.getElementById("jsonTokenArea");
-            if (copyText.value === "") return;
-            copyText.select();
-            navigator.clipboard.writeText(copyText.value).then(() => {
-                alert("Đã sao chép mã thành công!");
-            });
-        }
-    </script>
-</body>
-</html>
-        .main-title {
-            color: #00e676;
-            font-size: 22px;
-            font-weight: bold;
-            text-transform: uppercase;
-            line-height: 1.3;
-            letter-spacing: 0.5px;
-        }
-
-        .sub-title {
-            color: #ffcc00;
-            font-size: 24px;
-            font-weight: bold;
-            background-color: #262626;
-            padding: 14px;
-            border-radius: 10px;
-            margin: 20px auto;
-            width: 90%;
-        }
-
-        .btn-custom {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 90%;
-            padding: 14px 16px;
-            margin: 8px auto;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: bold;
-            text-decoration: none;
-            cursor: pointer;
-            color: #ffffff;
-        }
-
-        .btn-blue { background-color: #007bff; }
-        .btn-green { background-color: #28a745; }
-
-        /* KHUNG NÉT ĐỨT MÀU XANH LÁ */
-        .success-box {
-            border: 2px dashed #00e676;
-            border-radius: 12px;
-            padding: 15px;
-            margin: 20px auto 0 auto;
-            width: 90%;
-        }
-
-        .success-title {
-            color: #00e676;
-            font-weight: bold;
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-
-        .info-text {
-            color: #cccccc;
-            font-size: 13px;
-            margin-bottom: 12px;
-        }
-
-        .account-table {
-            width: 100%;
-            margin: 10px 0 15px 0;
-            border-collapse: collapse;
-            background-color: #222222;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        .account-table td {
-            padding: 10px;
-            font-size: 12px;
-            text-align: left;
-            border-bottom: 1px solid #333333;
-            color: #ffffff;
-        }
-
-        .json-textarea {
-            width: 100%;
-            height: 75px;
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid #444;
-            background-color: #121212;
-            color: #00e676;
-            font-family: monospace;
-            font-size: 11px;
-            resize: none;
-            outline: none;
-        }
-
-        .btn-copy {
-            width: 100%;
-            margin-top: 6px;
-            padding: 6px;
-            background-color: #ffcc00;
-            color: #000000;
-            font-weight: bold;
-            border: none;
-            border-radius: 4px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .btn-cloud {
-            background: linear-gradient(135deg, #00c6ff, #0072ff);
-            box-shadow: 0px 4px 15px rgba(0, 114, 255, 0.4);
-            width: 100%;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="main-card">
-        <h1 class="main-title">HỆ THỐNG ĐỔI MÁY</h1>
-        <h1 class="main-title">UGPHONE</h1>
-
-        <div class="sub-title">Ví của bạn: <span id="userCoin">168</span> COIN</div>
-
-        <button class="btn-custom btn-blue" onclick="nhanCoinLuon()">
-            🔗 NHẬN LUÔN COIN (+6 COIN)
-        </button>
-
-        <button class="btn-custom btn-green" onclick="batDauDoiMay()">
-            🎁 ĐỔI MÁY NGAY (Tốn 2 Coin)
-        </button>
-
-        <div id="successBox" class="success-box" style="display: none;">
-            <p class="success-title">🎉 ĐỔI MÁY THÀNH CÔNG!</p>
-            <p class="info-text">Đã trừ 2 Coin trong ví của bạn.</p>
-
-            <table class="account-table">
-                <tbody>
-                    <tr>
-                        <td style="width: 30%; font-weight: bold; color: #aaa;">Hạn máy:</td>
-                        <td style="color: #00e676; font-weight: bold;">Mới tinh (4 Giờ)</td>
-                    </tr>
-                    <tr>
-                        <td style="font-weight: bold; color: #aaa; vertical-align: top; padding-top: 12px;">Mã Code:</td>
-                        <td>
-                            <textarea id="jsonTokenArea" class="json-textarea" readonly></textarea>
-                            <button class="btn-copy" onclick="copyUgPhoneToken()">📋 Sao chép mã</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <a href="https://www.ugphone.com" target="_blank" class="btn-custom btn-cloud">
-                ☁️ auto mua máy và quick login code
-            </a>
-        </div>
-    </div>
-
-    <script>
-        // --- ĐIỀN THÔNG TIN SUPABASE CỦA BẠN VÀO ĐÂY ---
-        const SUPABASE_URL = "https://your-project-id.supabase.co";
-        const SUPABASE_KEY = "your-anon-key";
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // Khởi tạo số xu mặc định khi khách vừa vào trang web
-        let currentCoin = parseInt(localStorage.getItem("my_test_coins")) || 168;
-        document.getElementById("userCoin").innerText = currentCoin;
-
-        // Hàm xử lý khi ấn nút nhận luôn coin (Không cần vượt link thực tế)
-        function nhanCoinLuon() {
-            currentCoin += 6;
-            localStorage.setItem("my_test_coins", currentCoin);
-            document.getElementById("userCoin").innerText = currentCoin;
-            alert("Đã cộng thêm 6 Coin vào ví thành công!");
-        }
-
-        // Hàm xử lý đổi máy kết nối vào bảng 'kho_may'
-        async function batDauDoiMay() {
-            if (currentCoin < 2) {
-                alert("Bạn không đủ Coin!");
-                return;
-            }
-
-            // Kết nối tìm đúng dòng dữ liệu trong bảng kho_may của bạn
-            let { data: khoMay, error } = await _supabase
-                .from('kho_may') 
-                .select('*')
-                .limit(1); // Lấy tài khoản UgPhone đầu tiên bạn nạp ở Bước 1
-
-            if (error || !khoMay || khoMay.length === 0) {
-                alert("Hết máy trong bảng 'kho_may' rồi! Bạn hãy làm theo Bước 1 để nạp thêm acc vào database nhé.");
-                return;
-            }
-
-            // Trừ 2 xu lưu lại vào bộ nhớ máy khách
-            currentCoin -= 2;
-            localStorage.setItem("my_test_coins", currentCoin);
-            document.getElementById("userCoin").innerText = currentCoin;
-
-            // Đổ dữ liệu mã máy ra ô bảng thông tin. 
-            // Lưu ý: Thay chữ 'ma_token' thành tên cột chứa mã UgPhone thật trong bảng của bạn
-            document.getElementById("jsonTokenArea").value = khoMay[0].ma_token || JSON.stringify(khoMay[0]); 
-            document.getElementById("successBox").style.display = "block";
-        }
-
-        function copyUgPhoneToken() {
-            let copyText = document.getElementById("jsonTokenArea");
-            if (copyText.value === "") return;
-            copyText.select();
-            navigator.clipboard.writeText(copyText.value).then(() => {
-                alert("Đã sao chép mã thành công!");
-            });
-        }
-    </script>
-</body>
-</html>
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            text-decoration: none;
-            cursor: pointer;
-            color: #ffffff;
-            text-transform: uppercase;
-        }
-
-        .btn-blue { 
-            background-color: #007bff; 
-        }
-        
-        .btn-green { 
-            background-color: #28a745; 
-        }
-
-        /* KHUNG NÉT ĐỨT MÀU XANH LÁ HIỂN THỊ THÀNH CÔNG */
-        .success-box {
-            border: 2px dashed #00e676;
-            border-radius: 12px;
-            padding: 15px;
-            margin: 20px 0 0 0;
-            width: 100%;
-            background-color: transparent;
-        }
-
-        .success-title {
-            color: #00e676;
-            font-weight: bold;
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-
-        .info-text {
-            color: #cccccc;
-            font-size: 12px;
-            margin-bottom: 12px;
-        }
-
-        /* BẢNG TÀI KHOẢN NẰM TRONG KHUNG */
-        .account-table {
-            width: 100%;
-            margin: 10px 0;
-            border-collapse: collapse;
-            background-color: #222222;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        .account-table td {
-            padding: 10px;
-            font-size: 12px;
-            text-align: left;
-            border-bottom: 1px solid #333333;
-            color: #ffffff;
-        }
-
-        /* Ô CHỨA MÃ JSON CHỐNG TRÀN CHỮ TUYỆT ĐỐI */
-        .json-textarea {
-            width: 100%;
-            height: 75px;
-            padding: 6px;
-            border-radius: 4px;
-            border: 1px solid #444;
-            background-color: #121212;
-            color: #00e676;
-            font-family: monospace;
-            font-size: 11px;
-            resize: none;
-            outline: none;
-            white-space: pre-wrap; /* Tự động xuống hàng khi chuỗi quá dài */
-            word-wrap: break-word; /* Bẻ gãy từ dài để không đâm ra ngoài màn hình */
-        }
-
-        .btn-copy {
-            width: 100%;
-            margin-top: 6px;
-            padding: 6px;
-            background-color: #ffcc00;
-            color: #000000;
-            font-weight: bold;
-            border: none;
-            border-radius: 4px;
-            font-size: 11px;
-            cursor: pointer;
-        }
-
-        /* NÚT ĐÁM MÂY XANH DƯƠNG */
-        .btn-cloud {
-            background: linear-gradient(135deg, #00c6ff, #0072ff);
-            box-shadow: 0px 4px 15px rgba(0, 114, 255, 0.4);
-            width: 100%;
-            font-size: 12px;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="main-card">
-        <h1 class="main-title">HỆ THỐNG ĐỔI MÁY</h1>
-        <h1 class="main-title">UGPHONE</h1>
-
-        <div class="sub-title">Ví của bạn: <span id="userCoin">168</span> COIN</div>
-
-        <button class="btn-custom btn-blue" onclick="nhanCoinLuon()">
-            🔗 VƯỢT LINK NHẬN COIN (+6 COIN)
-        </button>
-
-        <button class="btn-custom btn-green" onclick="batDauDoiMay()">
-            🎁 ĐỔI MÁY NGAY (Tốn 2 Coin)
-        </button>
-
-        <div id="successBox" class="success-box" style="display: none;">
-            <p class="success-title">🎉 ĐỔI MÁY THÀNH CÔNG!</p>
-            <p class="info-text">Đã trừ 2 Coin trong ví của bạn.</p>
-
-            <table class="account-table">
-                <tbody>
-                    <tr>
-                        <td style="width: 30%; font-weight: bold; color: #aaa;">Hạn máy:</td>
-                        <td style="color: #00e676; font-weight: bold;">Mới tinh (4 Giờ)</td>
-                    </tr>
-                    <tr>
-                        <td style="font-weight: bold; color: #aaa; vertical-align: top; padding-top: 12px;">Mã Code:</td>
-                        <td>
-                            <textarea id="jsonTokenArea" class="json-textarea" readonly placeholder="Đang bốc mã..."></textarea>
-                            <button class="btn-copy" onclick="copyUgPhoneToken()">📋 Sao chép mã</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <a href="https://www.ugphone.com" target="_blank" class="btn-custom btn-cloud">
-                ☁️ auto mua máy và quick login code
-            </a>
-        </div>
-    </div>
-
-    <script>
-        // --- KẾT NỐI DATABASE THẬT ---
-        const SUPABASE_URL = "https://nigbaxusbacupefjkyud.supabase.co";
-        const SUPABASE_KEY = "Sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // Đọc số xu lưu trên máy người dùng công khai
-        let currentCoin = parseInt(localStorage.getItem("my_test_coins")) || 168;
-        document.getElementById("userCoin").innerText = currentCoin;
-
-        // Bấm nút xanh dương tự nổ xu luôn
-        function nhanCoinLuon() {
-            currentCoin += 6;
-            localStorage.setItem("my_test_coins", currentCoin);
-            document.getElementById("userCoin").innerText = currentCoin;
-            alert("Đã cộng thêm 6 Coin vào ví thành công!");
-        }
-
-        // Bấm đổi máy bốc từ bảng 'kho_may' của bạn
-        async function batDauDoiMay() {
-            if (currentCoin < 2) {
-                alert("Bạn không đủ Coin!");
-                return;
-            }
-
-            // Gọi lệnh lên Supabase bốc 1 dòng trong bảng kho_may của bạn
-            let { data: khoMay, error } = await _supabase
-                .from('kho_may') 
-                .select('*')
+                .eq('status', 'trong') 
                 .limit(1);
 
             if (error || !khoMay || khoMay.length === 0) {
-                alert("Hết máy trong kho rồi! Hãy vào bảng 'kho_may' bấm + Insert Row nạp token mẫu vào nha.");
+                alert("Hết máy trong kho rồi!");
                 return;
             }
 
-            // Trừ xu thành công
             currentCoin -= 2;
             localStorage.setItem("my_test_coins", currentCoin);
             document.getElementById("userCoin").innerText = currentCoin;
 
-            // Đổ chính xác thông tin lấy được ra ô text chống tràn
-            let tokenHienThi = khoMay[0].ma_token || JSON.stringify(khoMay[0]);
-            document.getElementById("jsonTokenArea").value = tokenHienThi; 
+            let chuoiMaSach = khoMay[0].ma_token || khoMay[0].token || khoMay[0].id_may || JSON.stringify(khoMay[0]);
             
-            // Hiện khung kết quả
+            document.getElementById("jsonTokenArea").innerText = chuoiMaSach; 
             document.getElementById("successBox").style.display = "block";
         }
 
-        // Sao chép nhanh
         function copyUgPhoneToken() {
-            let copyText = document.getElementById("jsonTokenArea");
-            if (copyText.value === "") return;
-            copyText.select();
-            navigator.clipboard.writeText(copyText.value).then(() => {
+            let copyText = document.getElementById("jsonTokenArea").innerText;
+            if (copyText === "") return;
+            navigator.clipboard.writeText(copyText).then(() => {
                 alert("Đã sao chép mã thành công!");
             });
         }
