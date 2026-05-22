@@ -3,171 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOP 1 CLOUD VN - Đổi Máy UgPhone Tự Động</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Đang xử lý cộng Coin...</title>
     <style>
         body {
             background-color: #121212;
             color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             text-align: center;
-            padding: 20px;
+            padding-top: 100px;
         }
-        .container {
-            max-width: 500px;
+        .loading-box {
+            max-width: 450px;
             margin: 0 auto;
             background: #1e1e1e;
-            padding: 20px;
+            padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 230, 118, 0.2);
-            border: 1px solid #00e676;
+            border: 1px solid #ffcc00;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.2);
         }
-        h1 { color: #00e676; font-size: 24px; }
-        .wallet {
-            font-size: 18px;
-            margin: 15px 0;
-            background: #2a2a2a;
-            padding: 10px;
-            border-radius: 8px;
-            border-left: 5px solid #ffcc00;
+        h2 { color: #ffcc00; margin-bottom: 10px; }
+        .loader {
+            border: 4px solid #333;
+            border-top: 4px solid #ffcc00;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
         }
-        .btn {
-            color: #000;
-            border: none;
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-            transition: 0.3s;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        .btn-link {
-            background: #00e676;
-        }
-        .btn-link:hover { 
-            background: #00b359; 
-            box-shadow: 0 0 10px rgba(0,230,118,0.5); 
-        }
-        .btn-buy {
-            background: #ffcc00;
-        }
-        .btn-buy:hover { 
-            background: #e6b800; 
-            box-shadow: 0 0 10px rgba(255,204,0,0.5); 
-        }
-        .output-box {
-            margin-top: 20px;
-            background: #000;
-            color: #00e676;
-            padding: 15px;
-            border-radius: 8px;
-            min-height: 50px;
-            font-family: monospace;
-            white-space: pre-wrap;
-            text-align: left;
-            font-size: 12px;
-            border: 1px dashed #00e676;
-        }
+        .error-text { color: #ff3333 !important; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>TOP 1 CLOUD VN 🌐</h1>
-    <p>Hệ thống tự động phát Combo 3 máy UgPhone treo game</p>
-    
-    <div class="wallet">💰 Số dư của bạn: <span id="so-coin">0</span> Coin</div>
-
-    <button class="btn btn-link" onclick="batDauLamNhiemVu()">VƯỢT LINK4M ĐỂ NHẬN COMBO 3 MÁY</button>
-    
-    <button class="btn btn-buy" onclick="muaMayVipTuDong()">MUA MÁY</button>
-
-    <div class="output-box" id="o-hien-thi-code">Mã Token F12 của 3 máy UgPhone sẽ xuất hiện ở đây sau khi bạn mua máy thành công...</div>
+<div class="loading-box" id="hop-thong-bao">
+    <h2 id="tieu-de">🎉 VƯỢT LINK THÀNH CÔNG!</h2>
+    <div class="loader" id="vong-xoay"></div>
+    <p id="noi-dung">Hệ thống đang kiểm tra và cộng 500 Coin vào tài khoản của bạn...</p>
 </div>
 
 <script>
-    const SUPABASE_URL = "https://nigbaxusbacupefjkyud.supabase.co"; 
-    const SUPABASE_KEY = "sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
-    const LINK4M_URL = "https://link4m.net/ZG7hvw";
-    const GIA_MAY_VIP = 500; 
-
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
     window.onload = function() {
-        let coinHienTai = localStorage.getItem('user_coin');
-        if (coinHienTai === null) {
-            coinHienTai = 0;
-            localStorage.setItem('user_coin', 0);
-        }
-        document.getElementById('so-coin').innerText = coinHienTai;
-    };
+        let daNhanLượtNay = localStorage.getItem('da_nhan_coin_roi');
 
-    function batDauLamNhiemVu() {
-        const homNay = new Date().toDateString(); 
-        const ngayDaVuot = localStorage.getItem('ngay_vuot_link');
+        if (daNhanLượtNay === "true") {
+            document.getElementById('tieu-de').innerText = "❌ CẢNH BÁO SPAM!";
+            document.getElementById('tieu-de').className = "error-text";
+            document.getElementById('vong-xoay').style.display = "none"; 
+            document.getElementById('noi-dung').innerText = "Bạn đã nhận phần thưởng cho lượt vượt link này rồi! Vui lòng quay lại sau 00:00 đêm.";
+            document.getElementById('noi-dung').className = "error-text";
 
-        if (ngayDaVuot === homNay) {
-            alert("Mỗi ngày bạn chỉ được vượt link nhận coin free 1 lần thôi! Nếu đã có đủ Coin, hãy bấm MUA MÁY nhé.");
-            return;
+            setTimeout(function() { window.location.href = "index.html"; }, 3000);
+            return; 
         }
 
-        // CHỖ SỬA QUAN TRỌNG: Xóa bỏ trạng thái đã nhận coin cũ để trang nhan-coin.html cho phép nhận lượt mới
-        localStorage.removeItem('da_nhan_coin_roi');
-
-        alert("Đang chuyển hướng bạn đến nhiệm vụ Link4M để tích luỹ 500 Coin...");
-        window.location.href = LINK4M_URL;
-    }
-
-    async function muaMayVipTuDong() {
         let coinHienTai = parseInt(localStorage.getItem('user_coin') || 0);
+        let coinMoi = coinHienTai + 500; 
+        localStorage.setItem('user_coin', coinMoi);
 
-        if (coinHienTai < GIA_MAY_VIP) {
-            alert(`Bạn không đủ Coin! Cần ${GIA_MAY_VIP} Coin để đổi máy, hiện tại bạn chỉ có ${coinHienTai} Coin. Hãy bấm vượt link để kiếm Coin nhé!`);
-            return;
-        }
+        localStorage.setItem('da_nhan_coin_roi', "true");
 
-        if (!confirm(`Bạn có chắc chắn muốn đổi ${GIA_MAY_VIP} Coin để lấy ngay Combo 3 máy không?`)) {
-            return;
-        }
+        // Đồng bộ lưu ngày đã vượt link
+        const homNay = new Date().toDateString();
+        localStorage.setItem('ngay_vuot_link', homNay);
+        localStorage.setItem('ngay_he_thong', homNay);
 
-        document.getElementById('o-hien-thi-code').innerText = "🔄 Hệ thống đang bốc máy từ kho Supabase...";
+        document.getElementById('noi-dung').innerText = "Đã cộng thành công 500 Coin vào ví! Đang đưa bạn quay lại trang chủ để thực hiện MUA MÁY...";
 
-        const { data: danhSachMay, error } = await _supabase
-            .from('kho_may')
-            .select('*')
-            .eq('trang_thai', 'trong')
-            .limit(3);
-
-        if (error || !danhSachMay || danhSachMay.length < 3) {
-            document.getElementById('o-hien-thi-code').innerText = "❌ HẾT MÁY! Kho máy không đủ 3 con, hãy báo Admin nạp thêm!";
-            return;
-        }
-
-        coinHienTai -= GIA_MAY_VIP;
-        localStorage.setItem('user_coin', coinHienTai);
-        document.getElementById('so-coin').innerText = coinHienTai;
-
-        let chuoiKetQua = "🎉 MUA MÁY THÀNH CÔNG! ĐÂY LÀ 3 MÁY CỦA BẠN:\n\n";
-        let danhSachId = [];
-
-        danhSachMay.forEach((may, index) => {
-            chuoiKetQua += `📱 MÁY SỐ ${index + 1}:\n${may.token}\n-----------------------\n`;
-            danhSachId.push(may.id);
-        });
-
-        document.getElementById('o-hien-thi-code').innerText = chuoiKetQua;
-
-        for (let id of danhSachId) {
-            await _supabase
-                .from('kho_may')
-                .update({ trang_thai: 'da_ban' })
-                .eq('id', id);
-        }
-
-        alert("Đã đổi máy thành công! Coin đã được trừ.");
-    }
+        setTimeout(function() { window.location.href = "index.html"; }, 2500);
+    };
 </script>
 </body>
 </html>
