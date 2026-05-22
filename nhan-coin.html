@@ -5,75 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đang xử lý cộng Coin...</title>
     <style>
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: 'Segoe UI', sans-serif;
-            text-align: center;
-            padding-top: 100px;
-        }
-        .loading-box {
-            max-width: 450px;
-            margin: 0 auto;
-            background: #1e1e1e;
-            padding: 30px;
-            border-radius: 15px;
-            border: 1px solid #ffcc00;
-            box-shadow: 0 0 15px rgba(255, 204, 0, 0.2);
-        }
-        h2 { color: #ffcc00; margin-bottom: 10px; }
-        .loader {
-            border: 4px solid #333;
-            border-top: 4px solid #ffcc00;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        body { background-color: #121212; color: #ffffff; font-family: 'Segoe UI', sans-serif; text-align: center; padding-top: 100px; }
+        .loading-box { max-width: 450px; margin: 0 auto; background: #1e1e1e; padding: 30px; border-radius: 15px; border: 1px solid #ffcc00; }
+        h2 { color: #ffcc00; }
         .error-text { color: #ff3333 !important; }
     </style>
 </head>
 <body>
-
-<div class="loading-box" id="hop-thong-bao">
+<div class="loading-box">
     <h2 id="tieu-de">🎉 VƯỢT LINK THÀNH CÔNG!</h2>
-    <div class="loader" id="vong-xoay"></div>
-    <p id="noi-dung">Hệ thống đang kiểm tra và cộng 500 Coin vào tài khoản của bạn...</p>
+    <p id="noi-dung">Hệ thống đang xử lý cộng xu...</p>
 </div>
-
 <script>
     window.onload = function() {
         let daNhanLượtNay = localStorage.getItem('da_nhan_coin_roi');
+        let coinHienTai = parseInt(localStorage.getItem('user_coin') || 0);
+        const COIN_TOI_DA_MOI_NGAY = 500;
 
-        if (daNhanLượtNay === "true") {
-            document.getElementById('tieu-de').innerText = "❌ CẢNH BÁO SPAM!";
+        // Chống spam lượt cũ hoặc cố tình hack ví khi đã chạm ngưỡng 500 xu
+        if (daNhanLượtNay === "true" || coinHienTai >= COIN_TOI_DA_MOI_NGAY) {
+            document.getElementById('tieu-de').innerText = "❌ CẢNH BÁO GIỚI HẠN!";
             document.getElementById('tieu-de').className = "error-text";
-            document.getElementById('vong-xoay').style.display = "none"; 
-            document.getElementById('noi-dung').innerText = "Bạn đã nhận phần thưởng cho lượt vượt link này rồi! Vui lòng quay lại sau 00:00 đêm.";
+            document.getElementById('noi-dung').innerText = "Bạn đã đạt giới hạn nhận tối đa 500 Coin của ngày hôm nay rồi! Vui lòng quay lại sau 00:00 đêm.";
             document.getElementById('noi-dung').className = "error-text";
-
             setTimeout(function() { window.location.href = "index.html"; }, 3000);
             return; 
         }
 
-        let coinHienTai = parseInt(localStorage.getItem('user_coin') || 0);
-        let coinMoi = coinHienTai + 500; 
-        localStorage.setItem('user_coin', coinMoi);
-
+        // Thực hiện cộng đúng 500 xu cho lượt làm nhiệm vụ thành công
+        localStorage.setItem('user_coin', coinHienTai + 500);
         localStorage.setItem('da_nhan_coin_roi', "true");
 
-        // Đồng bộ lưu ngày đã vượt link
         const homNay = new Date().toDateString();
         localStorage.setItem('ngay_vuot_link', homNay);
         localStorage.setItem('ngay_he_thong', homNay);
 
-        document.getElementById('noi-dung').innerText = "Đã cộng thành công 500 Coin vào ví! Đang đưa bạn quay lại trang chủ để thực hiện MUA MÁY...";
-
+        document.getElementById('noi-dung').innerText = "Đã cộng thành công 500 Coin vào ví! Đang đưa bạn quay lại trang chủ để thực hiện đổi máy...";
         setTimeout(function() { window.location.href = "index.html"; }, 2500);
     };
 </script>
