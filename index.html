@@ -43,22 +43,10 @@
             margin-top: 10px;
             transition: 0.3s;
         }
-        /* Nút vượt link màu xanh */
-        .btn-link {
-            background: #00e676;
-        }
-        .btn-link:hover { 
-            background: #00b359; 
-            box-shadow: 0 0 10px rgba(0,230,118,0.5); 
-        }
-        /* Nút mua máy màu vàng */
-        .btn-buy {
-            background: #ffcc00;
-        }
-        .btn-buy:hover { 
-            background: #e6b800; 
-            box-shadow: 0 0 10px rgba(255,204,0,0.5); 
-        }
+        .btn-link { background: #00e676; }
+        .btn-link:hover { background: #00b359; box-shadow: 0 0 10px rgba(0,230,118,0.5); }
+        .btn-buy { background: #ffcc00; }
+        .btn-buy:hover { background: #e6b800; box-shadow: 0 0 10px rgba(255,204,0,0.5); }
         .output-box {
             margin-top: 20px;
             background: #000;
@@ -83,53 +71,46 @@
     <div class="wallet">💰 Số dư của bạn: <span id="so-coin">0</span> Coin</div>
 
     <button class="btn btn-link" onclick="batDauLamNhiemVu()">VƯỢT LINK4M ĐỂ NHẬN COMBO 3 MÁY</button>
-    
     <button class="btn btn-buy" onclick="muaMayVipTuDong()">MUA MÁY</button>
 
-    <div class="output-box" id="o-hien-thi-code">Mã Token F12 của 3 máy UgPhone sẽ xuất hiện ở đây sau khi hành động thành công...</div>
+    <div class="output-box" id="o-hien-thi-code">Mã Token F12 của 3 máy UgPhone sẽ xuất hiện ở đây sau khi bạn mua máy thành công...</div>
 </div>
 
 <script>
     const SUPABASE_URL = "https://nigbaxusbacupefjkyud.supabase.co"; 
     const SUPABASE_KEY = "sb_publishable_ouFEtjFpNErrwTNAj32u_w_RAKDDgMy";
     const LINK4M_URL = "https://link4m.org/6lntv";
-    const GIA_MAY_VIP = 500; // Giá mua máy bằng coin
+    const GIA_MAY_VIP = 500; 
 
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     window.onload = function() {
-        hienThiCoinThucTe();
-        kiemTraKetQuaSauKhiVuot();
-    };
-
-    function hienThiCoinThucTe() {
         let coinHienTai = localStorage.getItem('user_coin');
         if (coinHienTai === null) {
             coinHienTai = 0;
             localStorage.setItem('user_coin', 0);
         }
         document.getElementById('so-coin').innerText = coinHienTai;
-    }
+    };
 
     function batDauLamNhiemVu() {
         const homNay = new Date().toDateString(); 
         const ngayDaVuot = localStorage.getItem('ngay_vuot_link');
 
         if (ngayDaVuot === homNay) {
-            alert("Bạn ơi! Mỗi ngày bạn chỉ được vượt link nhận máy free 1 lần. Muốn lấy tiếp hãy dùng Coin để mua máy nhé!");
+            alert("Mỗi ngày bạn chỉ được vượt link nhận coin free 1 lần thôi! Nếu đã có đủ Coin, hãy bấm MUA MÁY nhé.");
             return;
         }
 
-        alert("Đang chuyển hướng bạn đến nhiệm vụ Link4M để lấy mã...");
+        alert("Đang chuyển hướng bạn đến nhiệm vụ Link4M để tích luỹ 500 Coin...");
         window.location.href = LINK4M_URL;
     }
 
-    // Logic mua máy tự động bốc từ kho Supabase
     async function muaMayVipTuDong() {
         let coinHienTai = parseInt(localStorage.getItem('user_coin') || 0);
 
         if (coinHienTai < GIA_MAY_VIP) {
-            alert(`Không đủ Coin rồi bạn ơi! Bạn cần ${GIA_MAY_VIP} Coin để mua. Hãy tích cực vượt link để kiếm thêm Coin nhé!`);
+            alert(`Bạn không đủ Coin! Cần ${GIA_MAY_VIP} Coin để đổi máy, hiện tại bạn chỉ có ${coinHienTai} Coin. Hãy bấm vượt link để kiếm Coin nhé!`);
             return;
         }
 
@@ -137,7 +118,7 @@
             return;
         }
 
-        document.getElementById('o-hien-thi-code').innerText = "🔄 Hệ thống đang check kho và trừ coin, đợi tí...";
+        document.getElementById('o-hien-thi-code').innerText = "🔄 Hệ thống đang bốc máy từ kho Supabase...";
 
         const { data: danhSachMay, error } = await _supabase
             .from('kho_may')
@@ -146,8 +127,7 @@
             .limit(3);
 
         if (error || !danhSachMay || danhSachMay.length < 3) {
-            document.getElementById('o-hien-thi-code').innerText = "❌ HẾT MÁY TRONG KHO! Kho máy không đủ 3 con, hãy đợi Admin nạp thêm rồi mua nhé!";
-            alert("Kho hết máy rồi, số dư của bạn chưa bị trừ!");
+            document.getElementById('o-hien-thi-code').innerText = "❌ HẾT MÁY! Kho máy không đủ 3 con, hãy báo Admin nạp thêm!";
             return;
         }
 
@@ -172,55 +152,8 @@
                 .eq('id', id);
         }
 
-        alert("Đã đổi máy thành công! Coin đã được trừ tự động.");
-    }
-
-    async function kiemTraKetQuaSauKhiVuot() {
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        if (urlParams.get('status') === 'success' || window.location.search.includes('status=success')) {
-            
-            document.getElementById('o-hien-thi-code').innerText = "🔄 Đang bốc 3 máy từ kho Supabase, vui lòng chờ trong giây lát...";
-
-            const { data: danhSachMay, error } = await _supabase
-                .from('kho_may')
-                .select('*')
-                .eq('trang_thai', 'trong')
-                .limit(3);
-
-            if (error || !danhSachMay || danhSachMay.length < 3) {
-                document.getElementById('o-hien-thi-code').innerText = "❌ HẾT MÁY! Kho máy hiện tại không đủ 3 con, vui lòng báo Admin nạp thêm!";
-                return;
-            }
-
-            let chuoiKetQua = "🎉 VƯỢT LINK THÀNH CÔNG! ĐÂY LÀ 3 MÁY CỦA BẠN:\n\n";
-            let danhSachId = [];
-
-            danhSachMay.forEach((may, index) => {
-                chuoiKetQua += `📱 MÁY SỐ ${index + 1}:\n${may.token}\n-----------------------\n`;
-                danhSachId.push(may.id);
-            });
-
-            document.getElementById('o-hien-thi-code').innerText = chuoiKetQua;
-
-            for (let id of danhSachId) {
-                await _supabase
-                    .from('kho_may')
-                    .update({ trang_thai: 'da_ban' })
-                    .eq('id', id);
-            }
-
-            let coinMoi = parseInt(localStorage.getItem('user_coin') || 0) + 100;
-            localStorage.setItem('user_coin', coinMoi);
-            document.getElementById('so-coin').innerText = coinMoi;
-
-            const homNay = new Date().toDateString();
-            localStorage.setItem('ngay_vuot_link', homNay);
-            
-            alert("Chúc mừng bạn đã nhận thành công Combo 3 máy UgPhone và được tặng thêm 100 Coin!");
-        }
+        alert("Đã đổi máy thành công! Coin đã được trừ.");
     }
 </script>
-
 </body>
 </html>
